@@ -4,7 +4,6 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.user import UserCreate, UserResponse
 from app.schemas.token import Token
 from app.models.user import User
-from app.models.portfolio import Portfolio
 from app.database import get_db
 from app.utils import hash_password, verify_password, create_access_token
 from app.config import settings

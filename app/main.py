@@ -1,6 +1,6 @@
 # FastAPI instance and startup
 from fastapi import FastAPI
-from app.api.routers import auth, portfolio
+from app.api.routers import auth, portfolio, comparison, prediction,alert,risk,strategy
 from app.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -29,6 +29,16 @@ Base.metadata.create_all(bind=engine)
 # Include the routers for the various API endpoints
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(portfolio.router, prefix="/portfolio", tags=["Portfolio"])
+
+
+app.include_router(alert.router, prefix="/alert", tags=["Alert"])
+app.include_router(comparison.router, prefix="/comparison", tags=["Comparison"])
+app.include_router(prediction.router, prefix="/prediction", tags=["Prediction"])
+app.include_router(risk.router, prefix="/risk", tags=["Risk"])
+app.include_router(strategy.router, prefix="/strategy", tags=["Strategy"])
+
+
+
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 
 @app.get("/")
