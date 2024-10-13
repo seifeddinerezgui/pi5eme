@@ -1,11 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Cookie
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from fastapi.security import OAuth2PasswordRequestForm
+from starlette.responses import Response
+
 from app.schemas.user import UserCreate, UserResponse
 from app.schemas.token import Token
 from app.models.user import User
+from app.models.portfolio import Portfolio
 from app.database import get_db
-from app.utils import hash_password, verify_password, create_access_token
+from app.utils import *
 from app.config import settings
 from datetime import timedelta
 
@@ -14,6 +17,10 @@ from jose import JWTError, jwt
 from app.schemas.token import TokenData
 
 router = APIRouter()
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
 
 @router.post("/register", response_model=UserResponse)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
@@ -72,40 +79,57 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 #     db.refresh(new_user)
 #     return new_user
 
-@router.post("/login", response_model=Token)
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.username == form_data.username).first()
-    if not user or not verify_password(form_data.password, user.hashed_password):
+@router.post("/login")
+def login(requestBody : LoginRequest, response : Response,  db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.username == requestBody.username).first()
+    if not user or not verify_password(requestBody.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
     access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
-    access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
+    refresh_token_expires = timedelta(minutes=settings.refresh_token_expire_minutes)
+    access_token = create_access_token(username=user.username, expires_delta=access_token_expires)
+    refresh_token = create_refresh_token(username=user.username, expires_delta=refresh_token_expires)
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,  # Prevent JavaScript access to the cookie
+        samesite="strict",  # Adjust as necessary
+    )
+
+    return {
+                "access_token": access_token,
+                "token_type": "bearer",
+                "message": "Access token will expire in 30 minutes"
+            }
+
+@router.post("/refresh_token", response_model=Token)
+def refresh_access_token(response: Response, refresh_token: str = Cookie(None)):
+    if refresh_token is None:
+        raise HTTPException(status_code=403, detail="Refresh token is missing")
+
+    try:
+        payload = jwt.decode(refresh_token, settings.secret_key, algorithms=[settings.algorithm])
+        username = payload.get("sub")
+
+        # You might want to check if the refresh token is valid and belongs to the user
+        # This could involve checking it against a database of valid refresh tokens
+    except JWTError:
+        raise HTTPException(status_code=403, detail="Invalid refresh token")
+
+    # Create a new access token
+    access_token = create_access_token(username=username, expires_delta=timedelta(minutes=settings.access_token_expire_minutes))
+    refresh_token = create_refresh_token(username=username, expires_delta=timedelta(minutes=settings.refresh_token_expire_minutes))
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,  # Prevent JavaScript access to the cookie
+        samesite="strict",  # Adjust as necessary
+    )
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "message": "Access token will expire in 30 minutes"
+        "message": "New access token generated"
     }
 
 
 
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    credentials_exception = HTTPException(
-        status_code=401,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-        token_data = TokenData(username=username)
-    except JWTError:
-        raise credentials_exception
-    user = db.query(User).filter(User.username == token_data.username).first()
-    if user is None:
-        raise credentials_exception
-    return user
