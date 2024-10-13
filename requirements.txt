@@ -1,1 +1,11 @@
 # Dependencies
+fastapi
+uvicorn[standard]
+sqlalchemy
+pydantic
+email_validator
+pydantic_settings
+pymysql
+bcrypt
+python-jose[cryptography]
+python-multipart
