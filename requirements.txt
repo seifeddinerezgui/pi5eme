@@ -1,1 +1,14 @@
 # Dependencies
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+passlib
+jose
+alembic
+python-jose
+python-multipart
+psycopg2-binary
+python-dotenv
+bcrypt
+pydantic-settings
