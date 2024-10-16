@@ -1,14 +1,16 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 
+
 class UserCreate(BaseModel):
     username: str
     email: EmailStr
     password: str
-    age: int  # Age of the user
+    age: Optional[int] = None  # Age of the user
     experience: Optional[str] = None  # Experience level (optional)
     education_level: Optional[str] = None  # Level of education (optional)
     proficiency: Optional[str] = None  # Proficiency in trading (optional)
+
 
 class UserResponse(BaseModel):
     id: int
