@@ -1,14 +1,11 @@
 # Dependencies
 fastapi
-uvicorn
+uvicorn[standard]
 sqlalchemy
 pydantic
-passlib
-jose
-alembic
-python-jose
-python-multipart
-psycopg2-binary
-python-dotenv
+email_validator
+pydantic_settings
+pymysql
 bcrypt
-pydantic-settings
+python-jose[cryptography]
+python-multipart
