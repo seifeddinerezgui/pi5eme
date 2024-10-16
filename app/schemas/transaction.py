@@ -7,8 +7,7 @@ class TransactionBase(BaseModel):
     quantity: float
     price: float
     total: float
-    transaction_type: str  # 'buy' or 'sell'
-    position_type: str  # 'long' or 'short' position type
+    transaction_type: str
 
 class TransactionCreate(TransactionBase):
     user_id: int
