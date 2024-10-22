@@ -18,12 +18,14 @@ from app.schemas.token import TokenData
 
 router = APIRouter()
 
+
 class LoginRequest(BaseModel):
     username: str
     password: str
 
-@router.post("/register", response_model=UserResponse)
-def register_user(user: UserCreate, db: Session = Depends(get_db)):
+
+@router.post("/register")
+def register_user(user: UserCreate, response: Response, db: Session = Depends(get_db)):
     # Check if the user already exists
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
@@ -37,11 +39,9 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
         username=user.username,
         email=user.email,
         hashed_password=hashed_password,
-        age=user.age,
         experience=user.experience,
-        education_level=user.education_level,
         proficiency=user.proficiency
-    )
+        )
 
     # Save the user to the database
     db.add(new_user)
@@ -56,31 +56,25 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     )
     db.add(new_portfolio)
     db.commit()
-
-    # Return the user response without exposing the password
-    return UserResponse(
-        id=new_user.id, 
-        username=new_user.username, 
-        email=new_user.email,
-        age=new_user.age,
-        experience=new_user.experience,
-        education_level=new_user.education_level,
-        proficiency=new_user.proficiency
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+    refresh_token_expires = timedelta(minutes=settings.refresh_token_expire_minutes)
+    access_token = create_access_token(username=user.username, expires_delta=access_token_expires)
+    refresh_token = create_refresh_token(username=user.username, expires_delta=refresh_token_expires)
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,  # Prevent JavaScript access to the cookie
+        samesite="strict",  # Adjust as necessary
     )
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "message": "Access token will expire in 30 minutes"
+    }
 
-
-
-# @router.post("/register", response_model=UserResponse)
-# def register(user: UserCreate, db: Session = Depends(get_db)):
-#     hashed_pwd = hash_password(user.password)
-#     new_user = User(username=user.username, email=user.email, hashed_password=hashed_pwd)
-#     db.add(new_user)
-#     db.commit()
-#     db.refresh(new_user)
-#     return new_user
 
 @router.post("/login")
-def login(requestBody : LoginRequest, response : Response,  db: Session = Depends(get_db)):
+def login(requestBody: LoginRequest, response: Response, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == requestBody.username).first()
     if not user or not verify_password(requestBody.password, user.hashed_password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
@@ -93,14 +87,16 @@ def login(requestBody : LoginRequest, response : Response,  db: Session = Depend
         key="refresh_token",
         value=refresh_token,
         httponly=True,  # Prevent JavaScript access to the cookie
-        samesite="strict",  # Adjust as necessary
+        samesite="none",
+        secure=True
     )
 
     return {
-                "access_token": access_token,
-                "token_type": "bearer",
-                "message": "Access token will expire in 30 minutes"
-            }
+        "access_token": access_token,
+        "token_type": "bearer",
+        "message": "Access token will expire in 30 minutes"
+    }
+
 
 @router.post("/refresh_token", response_model=Token)
 def refresh_access_token(response: Response, refresh_token: str = Cookie(None)):
@@ -117,13 +113,16 @@ def refresh_access_token(response: Response, refresh_token: str = Cookie(None)):
         raise HTTPException(status_code=403, detail="Invalid refresh token")
 
     # Create a new access token
-    access_token = create_access_token(username=username, expires_delta=timedelta(minutes=settings.access_token_expire_minutes))
-    refresh_token = create_refresh_token(username=username, expires_delta=timedelta(minutes=settings.refresh_token_expire_minutes))
+    access_token = create_access_token(username=username,
+                                       expires_delta=timedelta(minutes=settings.access_token_expire_minutes))
+    refresh_token = create_refresh_token(username=username,
+                                         expires_delta=timedelta(minutes=settings.refresh_token_expire_minutes))
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
         httponly=True,  # Prevent JavaScript access to the cookie
-        samesite="strict",  # Adjust as necessary
+        samesite="none",
+        secure=True
     )
     return {
         "access_token": access_token,
@@ -132,4 +131,13 @@ def refresh_access_token(response: Response, refresh_token: str = Cookie(None)):
     }
 
 
-
+@router.post('/logout', status_code=204)
+async def logout(response: Response):
+    response.set_cookie(
+        key="refresh_token",
+        value='',
+        httponly=True,
+        samesite="none",
+        secure=True
+    )
+    return {"message": "you're logged out !"}
