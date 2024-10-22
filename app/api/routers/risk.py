@@ -1,12 +1,12 @@
 # main.py
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, FastAPI, HTTPException
 import httpx
 import numpy as np
 import pandas as pd
 import uvicorn
 
 
-app = FastAPI()
+router=APIRouter()
 
 # Replace with your Marketstack API key
 API_KEY = "8078ed800d7407105e179596b208a4ac"
@@ -62,7 +62,7 @@ def interpret_metrics(volatility, beta, sharpe_ratio):
 
     return interpretations, recommendations
 
-@app.get("/risk-assessment/{ticker}")
+@router.get("/risk-assessment/{ticker}")
 async def risk_assessment(ticker: str, timeframe: str = "1year"):
     url = f"http://api.marketstack.com/v1/eod?access_key={API_KEY}&symbols={ticker}&limit=365"
     

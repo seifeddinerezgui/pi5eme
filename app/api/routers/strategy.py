@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from pydantic import BaseModel
 
 import yfinance as yf
@@ -9,7 +9,7 @@ import uvicorn
 import ta
 from typing import Optional
 
-app = FastAPI()
+router=APIRouter()
 
 def calculate_moving_average(data, window):
     return data['Close'].rolling(window=window).mean()
@@ -77,7 +77,7 @@ class StockRequest(BaseModel):
     ticker: str
     prediction_days: Optional[int] = 60
 
-@app.post("/trading_strategy/")
+@router.post("/trading_strategy/")
 async def get_trading_strategy(request: StockRequest):
     ticker = request.ticker
     prediction_days = request.prediction_days
@@ -108,7 +108,7 @@ import finnhub
 finnhub_client = finnhub.Client(api_key="cs5c8u9r01qo1hu1debgcs5c8u9r01qo1hu1dec0")
 
 # Fetch recommendation trends for a given ticker
-@app.get("/recommendation/{ticker}")
+@router.get("/recommendation/{ticker}")
 def get_recommendation_trends(ticker: str):
     try:
         # Call Finnhub API to get recommendation trends

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, FastAPI, HTTPException
 import requests
 from transformers import T5ForConditionalGeneration, T5Tokenizer
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
@@ -9,7 +9,7 @@ import finnhub
 from pydantic import BaseModel
 
 
-app = FastAPI()
+router=APIRouter()
 
 class BestPeerResponse(BaseModel):
     best_peer: str
@@ -47,9 +47,11 @@ def fetch_market_news(api_key: str, ticker: str) -> List[Dict]:
     url = f"https://newsapi.org/v2/everything?q={ticker}&apiKey={api_key}"
     response = requests.get(url)
     if response.status_code == 200:
-        return response.json().get('articles', [])
+        articles = response.json().get('articles', [])
+        return articles[:10]  # Return only the first 10 articles
     else:
         raise HTTPException(status_code=response.status_code, detail="Error fetching market news.")
+
 
 # Summarization function
 def summary(input_news_article):
@@ -85,7 +87,7 @@ def interpret_sentiment(score: float) -> str:
         return "Neutral sentiment detected. Monitor the stock closely."
 
 # Analyze peers sentiment and get the best peer
-@app.get("/best-peer/{ticker}" , response_model=BestPeerResponse)
+@router.get("/best-peer/{ticker}" , response_model=BestPeerResponse)
 def get_best_peer(ticker: str) -> Dict[str, float]:
     peers = fetch_peers(ticker)
     market_data = {peer: fetch_market_news(NEWS_API_KEY, peer) for peer in peers}
@@ -105,13 +107,14 @@ def get_best_peer(ticker: str) -> Dict[str, float]:
     interpretation = interpret_sentiment(sentiment_score)
     
     return {
+        "peers": peers,
         "best_peer": best_peer,
         "sentiment_score": sentiment_score,
         "interpretation": interpretation
     }
 
 # Compare sentiment between two tickers
-@app.get("/compare-tickers/{ticker1}/{ticker2}", response_model=CompareTickersResponse)
+@router.get("/compare-tickers/{ticker1}/{ticker2}", response_model=CompareTickersResponse)
 def compare_tickers(ticker1: str, ticker2: str) -> Dict[str, float]:
     market_data = {
         ticker1: fetch_market_news(NEWS_API_KEY, ticker1),
@@ -141,5 +144,5 @@ def compare_tickers(ticker1: str, ticker2: str) -> Dict[str, float]:
         "interpretation": interpretation
     }
 
-# Run the FastAPI app (use "uvicorn script_name:app --reload" in terminal to run)
+# Run the FastAPI router (use "uvicorn script_name:router --reload" in terminal to run)
 

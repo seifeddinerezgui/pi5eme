@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, FastAPI, HTTPException
 from pydantic import BaseModel
 from datetime import datetime
 from typing import List
@@ -9,7 +9,7 @@ from app.database import get_db
 from models import alert
 
 
-app = FastAPI()
+router=APIRouter()
 
 # Predefined static user details
 static_user = {
@@ -41,7 +41,7 @@ def send_email(to_email: str, subject: str, message: str):
         server.sendmail(sender, [to_email], msg.as_string())
 
 # Endpoint to create an alert
-@app.post("/alerts/")
+@router.post("/alerts/")
 async def create_alert(ticker: str, condition: str):
     new_alert = alert(
         alert_id=len(alerts) + 1,
@@ -49,11 +49,11 @@ async def create_alert(ticker: str, condition: str):
         condition=condition,
         created_at=datetime.now()
     )
-    alerts.append(new_alert)
+    alerts.routerend(new_alert)
     return {"message": "Alert created successfully", "alert": new_alert}
 
 # Endpoint to check and trigger alerts
-@app.post("/trigger_alerts/")
+@router.post("/trigger_alerts/")
 async def trigger_alerts():
     for alert in alerts:
         # Check if the alert condition is met (this is just a static example)
@@ -67,5 +67,5 @@ async def trigger_alerts():
     
     return {"message": "No alerts triggered"}
 
-# Run the FastAPI app
+# Run the FastAPI router
 

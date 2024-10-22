@@ -1,7 +1,7 @@
 # app/utils.py
 import bcrypt
 from datetime import datetime, timedelta
-import jwt
+from jose import jwt
 from app.config import settings
 
 def hash_password(password: str) -> str:

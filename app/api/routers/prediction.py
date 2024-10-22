@@ -4,13 +4,14 @@ import numpy as np
 import pandas as pd
 import yfinance as yf
 import datetime as dt
+from fastapi import APIRouter
 from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, LSTM
 import uvicorn
 
 
-app = FastAPI()
+router=APIRouter()
 
 # Load the model globally (you can train it beforehand or dynamically in your code)
 scaler = MinMaxScaler(feature_range=(0, 1))
@@ -57,7 +58,7 @@ def build_and_train_model(company):
 class StockRequest(BaseModel):
     company: str
 
-@app.post("/predict/")
+@router.post("/predict/")
 async def predict_next_day(stock: StockRequest):
 
     result = build_and_train_model(stock.company)

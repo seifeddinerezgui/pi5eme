@@ -17,6 +17,6 @@ class User(Base):
     # Relationships
     portfolio = relationship("Portfolio", back_populates="user")
     transactions = relationship("Transaction", back_populates="user")
-    alerts = relationship("Alerts", back_populates="user")
+  #  alerts = relationship("Alerts", back_populates="user")
 
 
