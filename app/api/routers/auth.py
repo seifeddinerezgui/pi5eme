@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from starlette.responses import Response
 
+from app.models import Lesson, UserLesson
 from app.schemas.user import UserCreate, UserResponse
 from app.schemas.token import Token
 from app.models.user import User
@@ -56,6 +57,13 @@ def register_user(user: UserCreate, response: Response, db: Session = Depends(ge
     )
     db.add(new_portfolio)
     db.commit()
+
+    lessons = db.query(Lesson).all()
+    for lesson in lessons:
+        new_user_lesson = UserLesson(user_id=new_user.id,lesson_id=lesson.id)
+        db.add(new_user_lesson)
+    db.commit()
+
     access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     refresh_token_expires = timedelta(minutes=settings.refresh_token_expire_minutes)
     access_token = create_access_token(username=user.username, expires_delta=access_token_expires)
@@ -64,7 +72,8 @@ def register_user(user: UserCreate, response: Response, db: Session = Depends(ge
         key="refresh_token",
         value=refresh_token,
         httponly=True,  # Prevent JavaScript access to the cookie
-        samesite="strict",  # Adjust as necessary
+        samesite= "none",
+
     )
     return {
         "access_token": access_token,
@@ -88,7 +97,7 @@ def login(requestBody: LoginRequest, response: Response, db: Session = Depends(g
         value=refresh_token,
         httponly=True,  # Prevent JavaScript access to the cookie
         samesite="none",
-        secure=True
+
     )
 
     return {
@@ -98,7 +107,7 @@ def login(requestBody: LoginRequest, response: Response, db: Session = Depends(g
     }
 
 
-@router.post("/refresh_token", response_model=Token)
+@router.post("/refresh_token")
 def refresh_access_token(response: Response, refresh_token: str = Cookie(None)):
     if refresh_token is None:
         raise HTTPException(status_code=403, detail="Refresh token is missing")
@@ -117,12 +126,13 @@ def refresh_access_token(response: Response, refresh_token: str = Cookie(None)):
                                        expires_delta=timedelta(minutes=settings.access_token_expire_minutes))
     refresh_token = create_refresh_token(username=username,
                                          expires_delta=timedelta(minutes=settings.refresh_token_expire_minutes))
+    print('refresh route')
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
         httponly=True,  # Prevent JavaScript access to the cookie
         samesite="none",
-        secure=True
+
     )
     return {
         "access_token": access_token,
@@ -138,6 +148,6 @@ async def logout(response: Response):
         value='',
         httponly=True,
         samesite="none",
-        secure=True
+
     )
     return {"message": "you're logged out !"}
