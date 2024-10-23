@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routers import auth, order, portfolio, marketdata
+from app.api.routers import auth, order, portfolio, marketdata,Notification,PriceAlere
 from app.database import Base, engine, SessionLocal
 
 
@@ -71,7 +71,9 @@ app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 
 app.include_router(portfolio.router, prefix="/portfolio", tags=["Portfolio"])
 app.include_router(order.router, prefix="/order", tags=["Order"])
-app.include_router(marketdata.router, prefix="/market", tags=["MarketData"])  # Assurez-vous que le routeur marketdata est inclus
+app.include_router(marketdata.router, prefix="/market", tags=["MarketData"]) 
+app.include_router(Notification.router, prefix="/notifications", tags=["Notifications"])  
+app.include_router(PriceAlere.router, prefix="/alerts", tags=["Price Alerts"]) 
 
 @app.get("/")
 def read_root():
