@@ -1,6 +1,8 @@
 # main.py
 
 from fastapi import FastAPI
+from app.api.routers import auth, portfolio, user, education, lesson
+from app.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routers import auth, order, portfolio, marketdata,Notification,PriceAlere
 from app.database import Base, engine, SessionLocal
@@ -55,14 +57,6 @@ origins = [
     # Add more origins here if needed, or use "*" to allow all origins (not recommended in production)
 ]
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,  # Allows requests from Angular app
-    allow_credentials=True,  # Allows cookies and credentials
-    allow_methods=["*"],  # Allows all HTTP methods
-    allow_headers=["*"],  # Allows all headers
-)
-
 # Create all tables if they don't exist
 Base.metadata.create_all(bind=engine)
 
@@ -83,3 +77,14 @@ def read_root():
 app.add_middleware(AuthMiddleware)
 app.include_router(portfolio.router, prefix="/portfolio", tags=["Portfolio"])
 
+app.include_router(user.router, prefix="/user", tags=["User"])
+app.include_router(lesson.router,prefix="/lesson", tags=['Lesson'])
+app.include_router(education.router,prefix="/education",tags=['Education'])
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Allows requests from Angular app
+    allow_credentials=True,  # Allows cookies and credentials
+    allow_methods=["*"],  # Allows all HTTP methods
+    allow_headers=["*"],  # Allows all headers
+)
