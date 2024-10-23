@@ -1,6 +1,6 @@
 # FastAPI instance and startup
 from fastapi import FastAPI
-from app.api.routers import auth, portfolio
+from app.api.routers import auth, portfolio, user, education, lesson
 from app.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -57,7 +57,9 @@ app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 
 app.add_middleware(AuthMiddleware)
 app.include_router(portfolio.router, prefix="/portfolio", tags=["Portfolio"])
-
+app.include_router(user.router, prefix="/user", tags=["User"])
+app.include_router(lesson.router,prefix="/lesson", tags=['Lesson'])
+app.include_router(education.router,prefix="/education",tags=['Education'])
 
 app.add_middleware(
     CORSMiddleware,

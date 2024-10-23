@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from app.database import Base
+from app.models import user_lesson
+
 
 class User(Base):
     __tablename__ = "users"
@@ -17,4 +19,6 @@ class User(Base):
     # Relationships
     portfolio = relationship("Portfolio", back_populates="user")
     transactions = relationship("Transaction", back_populates="user")
+    user_lessons = relationship("UserLesson", back_populates="user")
+
 
