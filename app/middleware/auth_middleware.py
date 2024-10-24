@@ -14,7 +14,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
             print("path !!!! : ",request.url.path)
             return await call_next(request)
 
-        token = request.headers.get('Authorization')
+g        token = request.headers.get('Authorization')
         if token is None or not token.startswith('Bearer '):
             raise HTTPException(status_code=403, detail="Not authorized")
 
