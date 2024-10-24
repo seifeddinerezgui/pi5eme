@@ -1,5 +1,10 @@
 from datetime import time
 from fastapi import FastAPI, BackgroundTasks
+# FastAPI instance and startup
+from fastapi import FastAPI
+from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy
+from app.api.routers import auth, portfolio, user, education, lesson
+from app.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routers import auth, order, portfolio, marketdata
 from app.database import Base, engine, SessionLocal
@@ -61,15 +66,16 @@ origins = [
     # Add more origins or "*" for all (not recommended in production)
 ]
 
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=origins,  # Allows requests from Angular app
+    allow_credentials=True,  # Allows cookies and credentials
+    allow_methods=["*"],  # Allows all HTTP methods
+    allow_headers=["*"],  # Allows all headers
 )
 
-# Create database tables if they don't exist
+# Create all tables if they don't exist
 Base.metadata.create_all(bind=engine)
 
 # Include API routers
@@ -77,6 +83,13 @@ app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(portfolio.router, prefix="/portfolio", tags=["Portfolio"])
 app.include_router(order.router, prefix="/order", tags=["Order"])
 app.include_router(marketdata.router, prefix="/market", tags=["MarketData"])
+app.include_router(comparison.router, prefix="/comparison", tags=["Comparison"])
+app.include_router(prediction.router, prefix="/predeiction", tags=["Prediction"])
+app.include_router(risk.router, prefix="/risk", tags=["Risk"])
+app.include_router(strategy.router, prefix="/strategy", tags=["Strategy"])
+app.include_router(user.router, prefix="/user", tags=["User"])
+app.include_router(lesson.router,prefix="/lesson", tags=['Lesson'])
+app.include_router(education.router,prefix="/education",tags=['Education'])
 
 # Add custom middleware
 app.add_middleware(AuthMiddleware)
@@ -84,8 +97,5 @@ app.add_middleware(AuthMiddleware)
 def read_root():
     """Root endpoint."""
     return {"message": "Welcome to the Trading Simulator API!"}
-
-
-
 
 
