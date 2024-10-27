@@ -38,3 +38,14 @@ def get_intraday_data(symbol: str, timeframe: str = "5min", from_date: str = Non
         raise HTTPException(status_code=404, detail="No intraday data available")
 
     return data
+
+@router.get("/historical/{symbol}")
+def get_historical_data(symbol: str):
+    url = f"https://financialmodelingprep.com/api/v3/historical-price-full/{symbol}?apikey={FMP_API_KEY}"
+    response = requests.get(url)
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=response.status_code, detail="Error fetching data")
+
+    data = response.json().get('historical', [])
+    return data  # Return historical data as JSON

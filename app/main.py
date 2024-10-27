@@ -2,7 +2,7 @@ from datetime import time
 from fastapi import FastAPI, BackgroundTasks
 # FastAPI instance and startup
 from fastapi import FastAPI
-from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy
+from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy, stock_forcasting
 from app.api.routers import auth, portfolio, user, education, lesson
 from app.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
@@ -90,6 +90,7 @@ app.include_router(strategy.router, prefix="/strategy", tags=["Strategy"])
 app.include_router(user.router, prefix="/user", tags=["User"])
 app.include_router(lesson.router,prefix="/lesson", tags=['Lesson'])
 app.include_router(education.router,prefix="/education",tags=['Education'])
+app.include_router(stock_forcasting.router, prefix="/forecast", tags=["Forecasting"])
 
 # Add custom middleware
 app.add_middleware(AuthMiddleware)
