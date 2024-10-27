@@ -74,8 +74,6 @@ def register_user(user: UserCreate, response: Response, db: Session = Depends(ge
         httponly=True,  # Prevent JavaScript access to the cookie
         samesite= "none",
         secure=True
-
-
     )
     return {
         "access_token": access_token,
@@ -100,7 +98,6 @@ def login(requestBody: LoginRequest, response: Response, db: Session = Depends(g
         httponly=True,  # Prevent JavaScript access to the cookie
         samesite="none",
         secure=True
-
     )
 
     return {
@@ -137,7 +134,6 @@ def refresh_access_token(response: Response, refresh_token: str = Cookie(None)):
         samesite="none",
         secure=True
 
-
     )
     return {
         "access_token": access_token,
@@ -172,6 +168,5 @@ async def logout(response: Response):
         httponly=True,
         samesite="none",
         secure=True
-
     )
     return {"message": "you're logged out !"}

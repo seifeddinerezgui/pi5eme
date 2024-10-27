@@ -11,6 +11,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # Skip authentication for root ("/"), auth routes ("/auth"), and OpenAPI docs
         if request.url.path in ["/", "/docs", "/redoc", "/openapi.json"] or request.url.path.startswith("/auth"):
+            print("path !!!! : ",request.url.path)
             return await call_next(request)
 
         token = request.headers.get('Authorization')
@@ -24,7 +25,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
             print(payload)
             exp_time = datetime.utcfromtimestamp(payload['exp'])
             print(exp_time)
-            if(exp_time < datetime.now()):
+            if exp_time < datetime.now():
                 raise ExpiredSignatureError
         except (JWTError, IndexError):
             print('error log',JWTError)
