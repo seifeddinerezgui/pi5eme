@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from app.models import Portfolio, Asset, Transaction, User, Order
@@ -36,6 +38,7 @@ class OrderService:
             price=current_price,
             order_type="buy",  # Fixed as 'buy' since this is a buy order
             order_position_type=order_position_type,
+            executed_at=datetime.utcnow(),
             user_id=user_id
         )
 
@@ -138,6 +141,7 @@ class OrderService:
             price=current_price,
             order_type="sell",  # Fixed as 'sell' since this is a sell order
             order_position_type=asset.position_type,  # Use the existing position type
+            executed_at=datetime.utcnow(),
             user_id=user_id
         )
 
@@ -148,7 +152,7 @@ class OrderService:
             price=current_price,
             total=total_revenue,
             transaction_type="sell",
-            position_type=asset.position_type,  # Use the existing position type
+            position_type=asset.position_type, # Use the existing position type
             user_id=user_id
         )
 

@@ -12,6 +12,7 @@ class Transaction(Base):
     price = Column(Float)
     total = Column(Float)
     transaction_type = Column(String(4))  # 'buy' or 'sell'
+    position_type = Column(String(5), nullable=False)  # 'long' or 'short'
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user_id = Column(Integer, ForeignKey('users.id'))  # ForeignKey to User
