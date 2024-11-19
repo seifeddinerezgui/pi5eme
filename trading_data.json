@@ -1,0 +1,172 @@
+{
+    "AAPL": {
+        "ticker": "AAPL",
+        "moving_average_strategy": "Buy",
+        "rsi_strategy": "Hold",
+        "bollinger_bands_strategy": "Sell",
+        "overall_recommendation": "Hold",
+        "recommendation": [
+            {
+                "buy": 27,
+                "hold": 12,
+                "period": "2024-11-01",
+                "sell": 2,
+                "strongBuy": 13,
+                "strongSell": 0,
+                "symbol": "AAPL"
+            },
+            {
+                "buy": 27,
+                "hold": 12,
+                "period": "2024-10-01",
+                "sell": 1,
+                "strongBuy": 14,
+                "strongSell": 0,
+                "symbol": "AAPL"
+            },
+            {
+                "buy": 27,
+                "hold": 12,
+                "period": "2024-09-01",
+                "sell": 1,
+                "strongBuy": 14,
+                "strongSell": 0,
+                "symbol": "AAPL"
+            },
+            {
+                "buy": 24,
+                "hold": 12,
+                "period": "2024-08-01",
+                "sell": 1,
+                "strongBuy": 14,
+                "strongSell": 0,
+                "symbol": "AAPL"
+            }
+        ]
+    },
+    "META": {
+        "ticker": "AAPL",
+        "moving_average_strategy": "Buy",
+        "rsi_strategy": "Hold",
+        "bollinger_bands_strategy": "Buy",
+        "overall_recommendation": "Buy",
+        "recommendation": [
+            {
+                "buy": 42,
+                "hold": 8,
+                "period": "2024-11-01",
+                "sell": 2,
+                "strongBuy": 24,
+                "strongSell": 0,
+                "symbol": "META"
+            },
+            {
+                "buy": 42,
+                "hold": 7,
+                "period": "2024-10-01",
+                "sell": 2,
+                "strongBuy": 24,
+                "strongSell": 0,
+                "symbol": "META"
+            },
+            {
+                "buy": 40,
+                "hold": 7,
+                "period": "2024-09-01",
+                "sell": 2,
+                "strongBuy": 22,
+                "strongSell": 0,
+                "symbol": "META"
+            },
+            {
+                "buy": 39,
+                "hold": 6,
+                "period": "2024-08-01",
+                "sell": 2,
+                "strongBuy": 22,
+                "strongSell": 0,
+                "symbol": "META"
+            }
+        ]
+    },
+    "PINS": {
+        "recommendation": [
+            {
+                "buy": 23,
+                "hold": 13,
+                "period": "2024-11-01",
+                "sell": 0,
+                "strongBuy": 10,
+                "strongSell": 0,
+                "symbol": "PINS"
+            },
+            {
+                "buy": 23,
+                "hold": 13,
+                "period": "2024-10-01",
+                "sell": 0,
+                "strongBuy": 10,
+                "strongSell": 0,
+                "symbol": "PINS"
+            },
+            {
+                "buy": 22,
+                "hold": 13,
+                "period": "2024-09-01",
+                "sell": 0,
+                "strongBuy": 8,
+                "strongSell": 0,
+                "symbol": "PINS"
+            },
+            {
+                "buy": 22,
+                "hold": 13,
+                "period": "2024-08-01",
+                "sell": 0,
+                "strongBuy": 8,
+                "strongSell": 0,
+                "symbol": "PINS"
+            }
+        ]
+    },
+    "X": {
+        "recommendation": [
+            {
+                "buy": 9,
+                "hold": 4,
+                "period": "2024-11-01",
+                "sell": 0,
+                "strongBuy": 4,
+                "strongSell": 0,
+                "symbol": "X"
+            },
+            {
+                "buy": 9,
+                "hold": 4,
+                "period": "2024-10-01",
+                "sell": 0,
+                "strongBuy": 4,
+                "strongSell": 0,
+                "symbol": "X"
+            },
+            {
+                "buy": 6,
+                "hold": 6,
+                "period": "2024-09-01",
+                "sell": 0,
+                "strongBuy": 4,
+                "strongSell": 0,
+                "symbol": "X"
+            },
+            {
+                "buy": 6,
+                "hold": 6,
+                "period": "2024-08-01",
+                "sell": 0,
+                "strongBuy": 4,
+                "strongSell": 0,
+                "symbol": "X"
+            }
+        ]
+    }
+}

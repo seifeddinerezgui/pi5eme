@@ -1,0 +1,12 @@
+{
+    "AAPL_META": {
+        "better_ticker": "AAPL",
+        "sentiment_score": 0.9938279986381531,
+        "interpretation": "Positive sentiment detected. Consider buying or holding."
+    },
+    "META_AAPL": {
+        "better_ticker": "AAPL",
+        "sentiment_score": 0.9938279986381531,
+        "interpretation": "Positive sentiment detected. Consider buying or holding."
+    }
+}

@@ -3,13 +3,26 @@ from fastapi import APIRouter, FastAPI, HTTPException
 import httpx
 import numpy as np
 import pandas as pd
-import uvicorn
+import json
+import os
 
-
-router=APIRouter()
+router = APIRouter()
 
 # Replace with your Marketstack API key
 API_KEY = "8078ed800d7407105e179596b208a4ac"
+DATA_FILE = "risk_metrics.json"
+
+def load_data():
+    # Load data from JSON file if it exists, or return an empty dictionary
+    if os.path.exists(DATA_FILE):
+        with open(DATA_FILE, "r") as file:
+            return json.load(file)
+    return {}
+
+def save_data(data):
+    # Save data to JSON file
+    with open(DATA_FILE, "w") as file:
+        json.dump(data, file, indent=4)
 
 def calculate_volatility(prices):
     return np.std(prices) * np.sqrt(252)  # Annualized volatility
@@ -64,8 +77,15 @@ def interpret_metrics(volatility, beta, sharpe_ratio):
 
 @router.get("/risk-assessment/{ticker}")
 async def risk_assessment(ticker: str, timeframe: str = "1year"):
-    url = f"http://api.marketstack.com/v1/eod?access_key={API_KEY}&symbols={ticker}&limit=365"
+    # Load cached data
+    data_cache = load_data()
     
+    # Check if the ticker's data already exists in the cache
+    if ticker in data_cache:
+        return data_cache[ticker]
+
+    # Fetch data from Marketstack API
+    url = f"http://api.marketstack.com/v1/eod?access_key={API_KEY}&symbols={ticker}&limit=365"
     async with httpx.AsyncClient() as client:
         response = await client.get(url)
         if response.status_code != 200:
@@ -91,16 +111,20 @@ async def risk_assessment(ticker: str, timeframe: str = "1year"):
     # Interpret results
     interpretations, recommendations = interpret_metrics(volatility, beta, sharpe_ratio)
 
-    return {
+    # Structure the response
+    ticker_data = {
         "ticker": ticker,
         "volatility": volatility,
         "beta": beta,
         "sharpe_ratio": sharpe_ratio,
         "interpretations": interpretations,
-        "recommendations": recommendations,
-        #"last_price": prices[-1]
+        "recommendations": recommendations
     }
 
+    # Cache the calculated metrics
+    data_cache[ticker] = ticker_data
+    save_data(data_cache)
+
+    return ticker_data
+
 # To run the application, use the command: uvicorn main:app --reload
-
-

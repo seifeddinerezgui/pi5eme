@@ -1,0 +1,66 @@
+{
+    "AAPL": {
+        "ticker": "AAPL",
+        "volatility": 338.6307633686036,
+        "beta": 0.07836507633498853,
+        "sharpe_ratio": -0.7643045285485598,
+        "interpretations": {
+            "volatility": "High volatility indicates higher risk.",
+            "beta": "Lower than market risk.",
+            "sharpe_ratio": "Suboptimal risk-adjusted return."
+        },
+        "recommendations": [
+            "This stock may be suitable for aggressive investors.",
+            "Good for conservative investors.",
+            "Consider looking for better investment opportunities."
+        ]
+    },
+    "META": {
+        "ticker": "META",
+        "volatility": 1201.825668408505,
+        "beta": 0.01151975144381235,
+        "sharpe_ratio": -0.5586144617716995,
+        "interpretations": {
+            "volatility": "High volatility indicates higher risk.",
+            "beta": "Lower than market risk.",
+            "sharpe_ratio": "Suboptimal risk-adjusted return."
+        },
+        "recommendations": [
+            "This stock may be suitable for aggressive investors.",
+            "Good for conservative investors.",
+            "Consider looking for better investment opportunities."
+        ]
+    },
+    "X": {
+        "ticker": "X",
+        "volatility": 72.371223749389,
+        "beta": 0.2159707710230231,
+        "sharpe_ratio": -0.37124318944179563,
+        "interpretations": {
+            "volatility": "High volatility indicates higher risk.",
+            "beta": "Lower than market risk.",
+            "sharpe_ratio": "Suboptimal risk-adjusted return."
+        },
+        "recommendations": [
+            "This stock may be suitable for aggressive investors.",
+            "Good for conservative investors.",
+            "Consider looking for better investment opportunities."
+        ]
+    },
+    "PINS": {
+        "ticker": "PINS",
+        "volatility": 68.54191438079422,
+        "beta": 0.0063478240655345155,
+        "sharpe_ratio": -0.42184878855661967,
+        "interpretations": {
+            "volatility": "High volatility indicates higher risk.",
+            "beta": "Lower than market risk.",
+            "sharpe_ratio": "Suboptimal risk-adjusted return."
+        },
+        "recommendations": [
+            "This stock may be suitable for aggressive investors.",
+            "Good for conservative investors.",
+            "Consider looking for better investment opportunities."
+        ]
+    }
+}
