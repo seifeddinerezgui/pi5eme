@@ -2,8 +2,13 @@ from datetime import time
 from fastapi import FastAPI, BackgroundTasks
 # FastAPI instance and startup
 from fastapi import FastAPI
+
+from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy, note
+from app.api.routers import auth, portfolio, user, education, lesson
+
 from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy, stock_forcasting
 from app.api.routers import auth, portfolio, user, education, lesson, VaR_router
+
 from app.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routers import auth, order, portfolio, marketdata
@@ -85,6 +90,10 @@ app.include_router(strategy.router, prefix="/strategy", tags=["Strategy"])
 app.include_router(user.router, prefix="/user", tags=["User"])
 app.include_router(lesson.router,prefix="/lesson", tags=['Lesson'])
 app.include_router(education.router,prefix="/education",tags=['Education'])
+
+app.include_router(note.router,prefix="/note",tags=['Note'])
+
+
 app.include_router(stock_forcasting.router, prefix="/forecast", tags=["Forecasting"])
 app.include_router(VaR_router.router, prefix="/risk", tags=["Risk Management"])
 
@@ -94,6 +103,7 @@ app.add_middleware(AuthMiddleware)
 def read_root():
     """Root endpoint."""
     return {"message": "Welcome to the Trading Simulator API!"}
+
 
 app.add_middleware(
     CORSMiddleware,
