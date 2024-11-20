@@ -2,10 +2,6 @@ from fastapi import APIRouter, FastAPI
 from pydantic import BaseModel
 
 import yfinance as yf
-
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, LSTM
-import uvicorn
 import ta
 from typing import Optional
 

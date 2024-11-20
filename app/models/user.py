@@ -19,6 +19,8 @@ class User(Base):
     # Relationships
     portfolio = relationship("Portfolio", back_populates="user")
     transactions = relationship("Transaction", back_populates="user")
+    orders = relationship("Order", back_populates="user")  # Relation avec les ordres instantanés
+    scheduled_orders = relationship("ScheduledOrder", back_populates="user")
     user_lessons = relationship("UserLesson", back_populates="user")
     notes = relationship("Note",back_populates="author")
 
