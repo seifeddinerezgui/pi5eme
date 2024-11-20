@@ -20,9 +20,9 @@ def read_notifications(db: Session = Depends(get_db)):
     return get_notifications(db=db, user_id=user.id)
 
 @router.post("/", response_model=NotificationResponse)
-def add_notification(message: str, db: Session = Depends(get_db)):
+def add_notification(message: str,title: str, db: Session = Depends(get_db)):
     user = get_static_user(db)  # Utilisateur statique
-    return create_notification(db=db, message=message, user_id=user.id)
+    return create_notification(db=db, title=title,message=message, user_id=user.id)
 
 @router.patch("/{notification_id}", response_model=dict)
 def mark_as_read(notification_id: int, db: Session = Depends(get_db)):

@@ -1,11 +1,16 @@
 # main.py
 
 from fastapi import FastAPI
+from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy
 from app.api.routers import auth, portfolio, user, education, lesson
 from app.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routers import auth, order, portfolio, marketdata,Notification,PriceAlere
 from app.database import Base, engine, SessionLocal
+from app.services.PriceAlertSerice import check_price_alerts ,start_scheduler # Si cette fonction est utilisée pour vérifier les alertes
+from app.services.portfolio_management import start_balance_update_scheduler # Si cette fonction est utilisée pour vérifier les alertes
+
+
 
 
 
@@ -45,6 +50,11 @@ def custom_openapi():
 # Assign the custom OpenAPI function to the app
 app.openapi = custom_openapi
 
+@app.on_event("startup")
+def on_startup():
+    start_scheduler()  # Démarre le scheduler
+    start_balance_update_scheduler(1)
+
 
 @app.get("/")
 def read_root():
@@ -76,6 +86,14 @@ def read_root():
 
 app.add_middleware(AuthMiddleware)
 app.include_router(portfolio.router, prefix="/portfolio", tags=["Portfolio"])
+app.include_router(comparison.router, prefix="/comparison", tags=["Comparison"])
+app.include_router(prediction.router, prefix="/predeiction", tags=["Prediction"])
+app.include_router(risk.router, prefix="/risk", tags=["Risk"])
+app.include_router(strategy.router, prefix="/strategy", tags=["Strategy"])
+
+
+
+
 
 app.include_router(user.router, prefix="/user", tags=["User"])
 app.include_router(lesson.router,prefix="/lesson", tags=['Lesson'])

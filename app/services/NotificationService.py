@@ -4,8 +4,9 @@ from sqlalchemy.orm import Session
 from app.models import Notification
 from app.schemas.notification import NotificationResponse
 
-def create_notification(db: Session, message: str, user_id: int) -> NotificationResponse:
+def create_notification(db: Session, title: str,message: str, user_id: int) -> NotificationResponse:
     new_notification = Notification(
+        title=title,
         message=message,
         user_id=user_id
     )

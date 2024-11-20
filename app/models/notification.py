@@ -7,6 +7,8 @@ class Notification(Base):
     __tablename__ = "notifications"
 
     id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(255), nullable=False)  # Spécifier une longueur pour le VARCHAR
+
     message = Column(String(255), nullable=False)  # Spécifier une longueur pour le VARCHAR
     created_at = Column(DateTime, default=datetime.utcnow)
     read = Column(Integer, default=0)

@@ -1,10 +1,15 @@
 # app/services/portfolio_management.py
-
 from sqlalchemy.orm import Session
+
+  # Assurez-vous que getData est correctement importée
+from datetime import datetime
+from app.services.MarketDataService import MarketDataService
+from apscheduler.schedulers.background import BackgroundScheduler
+from app.database import SessionLocal
 from app.models import Portfolio, Asset, Transaction
 
 
-def get_portfolio(db: Session, user_id: int):
+def get_portfolio(db: Session, user_id: 1):
     return db.query(Portfolio).filter(Portfolio.user_id == user_id).first()
 
 def update_balance(db: Session, user_id: int, amount: float):
@@ -46,3 +51,57 @@ def update_portfolio(transaction: Transaction, db: Session):
             buyer_portfolio.balance += transaction.total
 
     db.commit()
+
+
+
+def update_portfolio_balance(db: Session, user_id: int):
+    portfolio = db.query(Portfolio).filter(Portfolio.user_id == user_id).first()
+    if not portfolio:
+        print(f"No portfolio found for user {user_id}")
+        return
+
+    total_balance_update = 0
+
+    
+    assets = db.query(Asset).filter(Asset.portfolio_id == portfolio.id).all()
+
+    for asset in assets:
+        
+        stock_info = MarketDataService.get_market_data(asset.symbol)
+        
+       
+        if isinstance(stock_info, float):
+            current_price = stock_info
+        elif isinstance(stock_info, dict) and 'price' in stock_info:
+            current_price = float(stock_info['price'].replace(',', ''))
+        else:
+            print(f"Erreur : données de prix non disponibles pour {asset.symbol}")
+            continue
+
+       
+        if asset.position_type == "long":
+            profit_loss = (current_price - asset.price_bought) * asset.quantity
+        elif asset.position_type == "short":
+            profit_loss = (asset.price_bought - current_price) * asset.quantity
+        else:
+            continue  
+        total_balance_update += profit_loss
+
+   
+    portfolio.balance += total_balance_update
+    db.commit()
+    print(f"Balance updated for user {user_id} at {datetime.utcnow()}")
+
+
+
+def start_balance_update_scheduler(user_id: int):
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(lambda: run_balance_update(user_id), 'interval', minutes=8)  # Exécuter toutes les minutes
+    scheduler.start()
+
+def run_balance_update(user_id: int):
+    db = SessionLocal()
+    try:
+        update_portfolio_balance(db, user_id)
+    finally:
+        db.close()

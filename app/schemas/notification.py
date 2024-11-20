@@ -4,6 +4,7 @@ from datetime import datetime
 
 class NotificationResponse(BaseModel):
     id: int
+    title: str
     message: str
     created_at: datetime
     read: Optional[bool] = False
