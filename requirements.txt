@@ -10,3 +10,13 @@ bcrypt
 python-jose[cryptography]
 python-multipart
 alembic
+transformers
+torch
+finnhub-python
+SentencePiece
+pandas
+yfinance
+scikit-learn
+tensorflow
+httpx
+ta
