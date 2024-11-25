@@ -1,6 +1,6 @@
 # FastAPI instance and startup
 from fastapi import FastAPI
-from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy
+from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy, bond
 from app.api.routers import auth, portfolio, user, education, lesson
 from app.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
@@ -62,6 +62,7 @@ app.include_router(comparison.router, prefix="/comparison", tags=["Comparison"])
 app.include_router(prediction.router, prefix="/predeiction", tags=["Prediction"])
 app.include_router(risk.router, prefix="/risk", tags=["Risk"])
 app.include_router(strategy.router, prefix="/strategy", tags=["Strategy"])
+app.include_router(bond.router,prefix="/bond", tags="Bond")
 
 
 

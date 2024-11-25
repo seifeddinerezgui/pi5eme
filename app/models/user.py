@@ -20,5 +20,6 @@ class User(Base):
     portfolio = relationship("Portfolio", back_populates="user")
     transactions = relationship("Transaction", back_populates="user")
     user_lessons = relationship("UserLesson", back_populates="user")
+    bonds = relationship("Bond", back_populates="user")  # Relation avec les bonds
 
 
