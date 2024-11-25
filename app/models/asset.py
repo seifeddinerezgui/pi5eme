@@ -9,8 +9,9 @@ class Asset(Base):
     symbol = Column(String(10), index=True)  # Stock symbol or asset identifier
     quantity = Column(Float)
     price_bought = Column(Float)
-    position_type = Column(String(5), nullable=False)  # 'long' or 'short'
-    portfolio_id = Column(Integer, ForeignKey('portfolios.id'))  # ForeignKey to Portfolio
 
+    position_type = Column(String(5), nullable=False)  # 'long' or 'short'
+
+    portfolio_id = Column(Integer, ForeignKey('portfolios.id'))  # ForeignKey to Portfolio
     # Relationship to portfolio
     portfolio = relationship("Portfolio", back_populates="assets")

@@ -1,14 +1,18 @@
-from datetime import datetime
 
+from datetime import datetime
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from app.models import Portfolio, Asset, Transaction, User, Order
 from app.services.MarketDataService import MarketDataService
 
+
 class OrderService:
 
     @staticmethod
     def create_buy_order(user_id: int, symbol: str, quantity: float, order_position_type: str, db: Session):
+        # Handle only market orders here
+        action = "market"
+
         # Step 1: Fetch user and portfolio
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
@@ -31,12 +35,13 @@ class OrderService:
         # Step 5: Deduct balance from portfolio
         portfolio.balance -= total_cost
 
-        # Step 6: Create a new order
+        # Step 6: Create a new market order
         db_order = Order(
             symbol=symbol,
             quantity=quantity,
             price=current_price,
-            order_type="buy",  # Fixed as 'buy' since this is a buy order
+            order_type="buy",
+            action=action,
             order_position_type=order_position_type,
             executed_at=datetime.utcnow(),
             user_id=user_id
@@ -82,16 +87,11 @@ class OrderService:
 
         return db_order
 
-
-
-
-
-##############################################################################################
-
-
-
     @staticmethod
     def create_sell_order(user_id: int, symbol: str, quantity: float, db: Session):
+        # Handle only market orders here
+        action = "market"
+
         # Step 1: Fetch user and portfolio
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
@@ -117,14 +117,8 @@ class OrderService:
         total_revenue = current_price * quantity
 
         # Step 6: Calculate profit/loss based on the position type
-        if asset.position_type == "long":
-            # For long positions, profit/loss is calculated against the average price bought
-            profit_loss = (current_price - asset.price_bought) * quantity
-        elif asset.position_type == "short":
-            # For short positions, profit/loss is calculated in reverse
-            profit_loss = (asset.price_bought - current_price) * quantity
-        else:
-            raise HTTPException(status_code=400, detail="Invalid order position type")
+        profit_loss = (current_price - asset.price_bought) * quantity if asset.position_type == "long" else (
+                                                                                                                        asset.price_bought - current_price) * quantity
 
         # Step 7: Update portfolio balance
         portfolio.balance += total_revenue + profit_loss
@@ -139,8 +133,9 @@ class OrderService:
             symbol=symbol,
             quantity=quantity,
             price=current_price,
-            order_type="sell",  # Fixed as 'sell' since this is a sell order
-            order_position_type=asset.position_type,  # Use the existing position type
+            order_type="sell",
+            action=action,
+            order_position_type=asset.position_type,
             executed_at=datetime.utcnow(),
             user_id=user_id
         )
@@ -152,7 +147,7 @@ class OrderService:
             price=current_price,
             total=total_revenue,
             transaction_type="sell",
-            position_type=asset.position_type, # Use the existing position type
+            position_type=asset.position_type,
             user_id=user_id
         )
 
@@ -164,3 +159,4 @@ class OrderService:
         db.refresh(portfolio)
 
         return db_order
+

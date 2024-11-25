@@ -1,12 +1,15 @@
+from dataclasses import Field
 from datetime import datetime
 
 from pydantic import BaseModel
-from typing import Literal
+from typing import Literal, Optional
+
 
 class OrderCreate(BaseModel):
     symbol: str
     quantity: float
     order_position_type: Literal['long', 'short']
+
 
 
 class SellOrderCreate(BaseModel):
@@ -21,3 +24,4 @@ class OrderResponse(BaseModel):
     order_type: str
     order_position_type: str
     executed_at: datetime | None
+    status: str
