@@ -118,7 +118,7 @@ class OrderService:
 
         # Step 6: Calculate profit/loss based on the position type
         profit_loss = (current_price - asset.price_bought) * quantity if asset.position_type == "long" else (
-                                                                                                                        asset.price_bought - current_price) * quantity
+                                                                                                                asset.price_bought - current_price) * quantity
 
         # Step 7: Update portfolio balance
         portfolio.balance += total_revenue + profit_loss
