@@ -2,7 +2,8 @@ from datetime import datetime
 
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
-from app.models import Portfolio, Asset, Transaction, User, Order
+from app.models import Portfolio, Asset, Transaction, User
+from app.models.order import Order
 from app.services.MarketDataService import MarketDataService
 
 class OrderService:

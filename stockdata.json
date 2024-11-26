@@ -1,0 +1,12 @@
+[
+    {
+        "symbol": "AAPL",
+        "price": "227.10",
+        "change": "(+0.40%)"
+    },
+    {
+        "symbol": "TWTR",
+        "price": "5,713.25",
+        "change": "(+0.08%)"
+    }
+]

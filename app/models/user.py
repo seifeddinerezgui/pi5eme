@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from app.database import Base
+from app.models import user_lesson
+
 
 class User(Base):
     __tablename__ = "users"
@@ -19,3 +21,7 @@ class User(Base):
     transactions = relationship("Transaction", back_populates="user")
     orders = relationship("Order", back_populates="user")  # Relation avec les ordres instantanés
     scheduled_orders = relationship("ScheduledOrder", back_populates="user")
+    user_lessons = relationship("UserLesson", back_populates="user")
+    notes = relationship("Note",back_populates="author")
+
+

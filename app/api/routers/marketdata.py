@@ -1,7 +1,6 @@
 # marketdata.py
 
 from fastapi import HTTPException, APIRouter
-
 from app.services.MarketDataService import MarketDataService
 
 router = APIRouter()
@@ -29,3 +28,4 @@ def get_stock_data1(symbol: str, interval: str = "1d"):
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+
