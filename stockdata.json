@@ -1,12 +1,12 @@
 [
     {
         "symbol": "AAPL",
-        "price": "226.96",
-        "change": "(-0.12%)"
+        "price": "235.06",
+        "change": "(+0.94%)"
     },
     {
         "symbol": "TWTR",
-        "price": "6,047.75",
-        "change": "+0.37%"
+        "price": "6,021.63",
+        "change": "+0.57%"
     }
 ]
