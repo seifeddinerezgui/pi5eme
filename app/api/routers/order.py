@@ -13,21 +13,23 @@ router = APIRouter()
 
 @router.post("/", response_model=OrderResponse)
 def place_order(
-    request:Request,
+    request: Request,
     order: OrderCreate,
-    db: Session = Depends(get_db)  
+    db: Session = Depends(get_db)
 ):
-    id = db.query(User).filter(User.username == request.state.user).first().id
-    # Call the OrderService to place the order
+    user_id = db.query(User).filter(User.username == request.state.user).first().id
     return OrderService.create_order(
-        user_id=id,
+        user_id=user_id,
         symbol=order.symbol,
         quantity=order.quantity,
         order_type=order.order_type,
         action=order.action,
         price=order.price,
+        take_profit=order.take_profit,  # Pass TP
+        stop_loss=order.stop_loss,  # Pass SL
         db=db
     )
+
 
 @router.get("/", response_model=list[OrderResponse])
 def get_user_orders(

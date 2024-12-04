@@ -23,4 +23,6 @@ class User(Base):
     scheduled_orders = relationship("ScheduledOrder", back_populates="user")
     user_lessons = relationship("UserLesson", back_populates="user")
 
+    historical_trades = relationship("HistoricalTrade", back_populates="user")
+
 

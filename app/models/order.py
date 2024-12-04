@@ -15,6 +15,11 @@ class Order(Base):
     action = Column(String(4), nullable=False)  # 'buy' or 'sell'
     status = Column(String(10), default="pending")  # 'pending', 'executed'
     executed_at = Column(DateTime, nullable=True)
+    take_profit = Column(Float, nullable=True)  # New Field: Take Profit
+    stop_loss = Column(Float, nullable=True)  # New Field: Stop Loss
 
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship("User", back_populates="orders")
+
+
+
