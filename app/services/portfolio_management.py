@@ -6,7 +6,9 @@ from datetime import datetime
 from app.services.MarketDataService import MarketDataService
 from apscheduler.schedulers.background import BackgroundScheduler
 from app.database import SessionLocal
-from app.models import Portfolio, Asset, Transaction
+from app.models import Portfolio, Asset, Transaction,Order,User
+from collections import defaultdict
+from sqlalchemy.sql import func
 
 
 def get_portfolio(db: Session, user_id: 1):
@@ -105,3 +107,51 @@ def run_balance_update(user_id: int):
         update_portfolio_balance(db, user_id)
     finally:
         db.close()
+
+def calculate_asset_percentages(portfolio_id: int, db: Session):
+    # Récupérer le portefeuille avec ses actifs
+    portfolio = db.query(Portfolio).filter(Portfolio.id == portfolio_id).first()
+    
+    if not portfolio:
+        raise ValueError("Portfolio not found")
+    
+    total_balance = portfolio.balance
+    if total_balance <= 0:
+        raise ValueError("Portfolio balance must be greater than zero")
+    
+    # Regrouper les actifs par symbole
+    symbol_totals = defaultdict(float)  # Dictionnaire pour stocker la valeur totale de chaque symbole
+    for asset in portfolio.assets:
+        asset_value = asset.quantity * asset.price_bought
+        symbol_totals[asset.symbol] += asset_value
+    
+    # Calculer les pourcentages
+    asset_percentages = []
+    for symbol, total_value in symbol_totals.items():
+        percentage = (total_value / total_balance) * 100
+        asset_percentages.append({
+            "symbol": symbol,
+            "percentage": percentage
+        })
+    
+    return asset_percentages
+def calculate_user_ranks(db: Session):
+    # Récupérer les utilisateurs et le nombre d'ordres passés par chacun
+    users_with_order_counts = (
+        db.query(User.id, User.username, func.count(Order.id).label("order_count"))
+        .join(Order, User.id == Order.user_id)
+        .group_by(User.id)
+        .order_by(func.count(Order.id).desc())  # Trier par nombre d'ordres décroissant
+        .all()
+    )
+
+    # Calculer les rangs
+    user_ranks = {}
+    for rank, user in enumerate(users_with_order_counts, start=1):
+        user_ranks[user.id] = {
+            "username": user.username,
+            "order_count": user.order_count,
+            "rank": rank,
+        }
+
+    return user_ranks
