@@ -1,69 +1,114 @@
 from fastapi import APIRouter, HTTPException, Depends
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
-import pandas as pd
 import numpy as np
+import pandas as pd
+import datetime as dt
+from typing import List, Dict
 from app.database import get_db
 from app.models import Portfolio, Transaction, User
-from datetime import datetime
+from app.api.routers.marketdata import router as marketdata_router
 
+# FastAPI Router for Monte Carlo Simulation
 router = APIRouter()
+router.include_router(marketdata_router, prefix="/marketdata")
 
-# Value-at-Risk Calculation Function
-def calculate_daily_returns(transactions):
-    # Ensure transactions are sorted by date
-    transactions.sort(key=lambda x: x.created_at)
+class MonteCarloParams(BaseModel):
+    user_id: int
+    start_date: dt.datetime
+    end_date: dt.datetime
+    num_simulations: int
+    time_horizon: int
+    cvar_alpha: float
+    var_alpha: float
 
-    # Extract prices and calculate returns based on price changes
-    prices = [txn.price for txn in transactions]
-    returns = pd.Series(prices).pct_change().dropna()
-    return returns
+class MonteCarloResponse(BaseModel):
+    avg_expected_return: float
+    value_at_risk_95: float
+    conditional_var: float
+    simulations: Dict[int, List[float]]
 
-def simulate_portfolio_outcomes(initial_value, returns, num_simulations, time_horizon):
-    simulations = []
-    mean_return = returns.mean()
-    std_dev = returns.std()
+class MonteCarloSimulator:
 
-    for _ in range(num_simulations):
-        portfolio_values = [initial_value]
-        for _ in range(time_horizon):
-            simulated_return = np.random.normal(mean_return, std_dev)
-            next_value = portfolio_values[-1] * (1 + simulated_return)
-            portfolio_values.append(next_value)
-        simulations.append(portfolio_values)
+    def __init__(self, cvar_alpha: float, var_alpha: float):
+        self.stocks = {}
+        self.init_cash = 0
+        self.cvar_alpha = cvar_alpha
+        self.var_alpha = var_alpha
+        self.pct_mean_return = None
+        self.pct_cov_matrix = None
+        self.portfolio_returns = None
 
-    return pd.DataFrame(simulations).T
+    def get_portfolio(self, portfolio: Portfolio, start_time: dt.datetime, end_time: dt.datetime) -> None:
+        stocks = list(portfolio.stocks.keys())
+        stocks_data = marketdata_router.get_historical_data(stocks)  # Updated to use marketdata router
+        
+        stocks_data = stocks_data['Close'].dropna()
+        pct_return = stocks_data.pct_change().dropna()
+        self.pct_mean_return = pct_return.mean()
+        self.pct_cov_matrix = pct_return.cov()
+        self.init_cash = portfolio.book_amount
+        self._get_weights(portfolio)
 
-@router.get("/montecarlo/{user_id}")
-def monte_carlo_simulation(user_id: int, num_simulations: int = 1000, time_horizon: int = 252, db: Session = Depends(get_db)):
-    # Fetch user's portfolio balance
-    user = db.query(User).filter(User.id == user_id).first()
+    def _get_weights(self, portfolio: Portfolio):
+        total_book_cost = 0
+        for stock in portfolio.stocks.keys():
+            self.stocks[stock] = portfolio.stocks[stock].get_book_cost()
+            total_book_cost += self.stocks[stock]
+
+        for stock in portfolio.stocks.keys():
+            self.stocks[stock] = self.stocks[stock] / total_book_cost
+
+    def apply_monte_carlo(self, num_simulations: int, time_horizon: int) -> None:
+        weights = np.array(list(self.stocks.values()), dtype=np.float64)
+        mean_matrix = np.full((time_horizon, len(weights)), self.pct_mean_return).T
+        portfolio_returns = np.zeros((time_horizon, num_simulations), dtype=np.float64)
+
+        for sim in range(num_simulations):
+            Z = np.random.normal(size=(time_horizon, len(weights)))
+            L = np.linalg.cholesky(self.pct_cov_matrix)
+            daily_returns = mean_matrix + np.inner(L, Z)
+            portfolio_returns[:, sim] = np.cumprod(np.inner(weights, daily_returns.T) + 1) * self.init_cash
+
+        self.portfolio_returns = portfolio_returns
+
+    def get_var(self) -> float:
+        if self.portfolio_returns is None:
+            raise Exception("No Monte Carlo simulation has been applied")
+        var = np.quantile(self.portfolio_returns[-1, :], self.var_alpha)
+        return var
+
+    def get_cvar(self) -> float:
+        if self.portfolio_returns is None:
+            raise Exception("No Monte Carlo simulation has been applied")
+        var = self.get_var()
+        cvar = np.mean(self.portfolio_returns[-1, self.portfolio_returns[-1, :] < var])
+        return cvar
+
+@router.post("/montecarlo", response_model=MonteCarloResponse)
+def monte_carlo_simulation(params: MonteCarloParams, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == params.user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    portfolio = db.query(Portfolio).filter(Portfolio.user_id == user_id).first()
+
+    portfolio = db.query(Portfolio).filter(Portfolio.user_id == params.user_id).first()
     if not portfolio:
         raise HTTPException(status_code=404, detail="Portfolio not found")
 
-    # Query all transactions
-    transactions = db.query(Transaction).filter(Transaction.user_id == user_id).all()
-    if not transactions:
-        raise HTTPException(status_code=404, detail="No transactions found for this user")
+    simulator = MonteCarloSimulator(cvar_alpha=params.cvar_alpha, var_alpha=params.var_alpha)
+    simulator.get_portfolio(portfolio, params.start_date, params.end_date)
+    simulator.apply_monte_carlo(params.num_simulations, params.time_horizon)
 
-    # Calculate daily returns from transaction data
-    returns = calculate_daily_returns(transactions)
-    if returns.empty:
-        raise HTTPException(status_code=400, detail="Insufficient data for VaR calculation")
-
-    # Run Monte Carlo simulation
-    initial_value = portfolio.balance
-    simulation_results = simulate_portfolio_outcomes(initial_value, returns, num_simulations, time_horizon)
-
-    # Calculate summary statistics for visualization
-    final_values = simulation_results.iloc[-1]
+    final_values = simulator.portfolio_returns[-1]
     avg_return = final_values.mean()
-    var_95 = np.percentile(final_values, 5)  # 5th percentile for VaR at 95% confidence
+    var_95 = simulator.get_var()
+    cvar_95 = simulator.get_cvar()
 
-    return {
-        "avg_expected_return": avg_return,
-        "value_at_risk_95": initial_value - var_95,
-        "simulations": simulation_results.to_dict(orient="list")
-    }
+    simulations_dict = {i: simulator.portfolio_returns[:, i].tolist() for i in range(params.num_simulations)}
+
+    return MonteCarloResponse(
+        avg_expected_return=avg_return,
+        value_at_risk_95=var_95,
+        conditional_var=cvar_95,
+        simulations=simulations_dict
+    )
