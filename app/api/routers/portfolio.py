@@ -42,23 +42,17 @@ def get_asset_percentages(request: Request, db: Session = Depends(get_db)):
 
     # Retourner les pourcentages
     return {"asset_percentages": asset_percentages}
-def calculate_user_ranks(db: Session):
-    # Récupérer tous les utilisateurs et leurs ordres
-    users_with_order_counts = (
-        db.query(User.id, User.username, func.count(Order.id).label("order_count"))
-        .join(Order, User.id == Order.user_id)
-        .group_by(User.id)
-        .order_by(func.count(Order.id).desc())  # Tri par nombre d'ordres décroissant
-        .all()
-    )
 
-    # Calculer les rangs
-    user_ranks = {}
-    for rank, user in enumerate(users_with_order_counts, start=1):
-        user_ranks[user.id] = {
-            "username": user.username,
-            "order_count": user.order_count,
-            "rank": rank,
-        }
+@router.get("/all-ranks")
+def get_all_user_ranks(db: Session = Depends(get_db)):
+    from app.services.portfolio_management import get_all_user_ranks_by_balance
 
-    return user_ranks
+    # Calculer les rangs de tous les utilisateurs
+    user_ranks = get_all_user_ranks_by_balance(db)
+
+    # Vérifier s'il y a des utilisateurs
+    if not user_ranks:
+        raise HTTPException(status_code=404, detail="No users found")
+
+    # Retourner les rangs
+    return {"user_ranks": user_ranks}

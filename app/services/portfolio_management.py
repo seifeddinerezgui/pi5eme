@@ -8,7 +8,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from app.database import SessionLocal
 from app.models import Portfolio, Asset, Transaction,Order,User
 from collections import defaultdict
-from sqlalchemy.sql import func
+
 
 
 def get_portfolio(db: Session, user_id: 1):
@@ -135,23 +135,22 @@ def calculate_asset_percentages(portfolio_id: int, db: Session):
         })
     
     return asset_percentages
-def calculate_user_ranks(db: Session):
-    # Récupérer les utilisateurs et le nombre d'ordres passés par chacun
-    users_with_order_counts = (
-        db.query(User.id, User.username, func.count(Order.id).label("order_count"))
-        .join(Order, User.id == Order.user_id)
-        .group_by(User.id)
-        .order_by(func.count(Order.id).desc())  # Trier par nombre d'ordres décroissant
+def get_all_user_ranks_by_balance(db: Session):
+    # Récupérer les utilisateurs et les soldes de leurs portefeuilles
+    users_with_balances = (
+        db.query(User.id, User.username, Portfolio.balance)
+        .join(Portfolio, User.id == Portfolio.user_id)
+        .order_by(Portfolio.balance.desc())  # Trier par balance décroissante
         .all()
     )
 
-    # Calculer les rangs
-    user_ranks = {}
-    for rank, user in enumerate(users_with_order_counts, start=1):
-        user_ranks[user.id] = {
-            "username": user.username,
-            "order_count": user.order_count,
+    # Générer une liste avec les rangs
+    user_ranks = []
+    for rank, user in enumerate(users_with_balances, start=1):
+        user_ranks.append({
             "rank": rank,
-        }
+            "username": user.username,
+            "balance": user.balance
+        })
 
     return user_ranks
