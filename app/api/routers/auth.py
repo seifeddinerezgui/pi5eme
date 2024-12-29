@@ -73,7 +73,7 @@ def register_user(user: UserCreate, response: Response, db: Session = Depends(ge
         value=refresh_token,
         httponly=True,  # Prevent JavaScript access to the cookie
         samesite= "none",
-
+        secure=True
     )
     return {
         "access_token": access_token,
@@ -97,7 +97,7 @@ def login(requestBody: LoginRequest, response: Response, db: Session = Depends(g
         value=refresh_token,
         httponly=True,  # Prevent JavaScript access to the cookie
         samesite="none",
-
+        secure=True
     )
 
     return {
@@ -132,6 +132,7 @@ def refresh_access_token(response: Response, refresh_token: str = Cookie(None)):
         value=refresh_token,
         httponly=True,  # Prevent JavaScript access to the cookie
         samesite="none",
+        secure=True
 
     )
     return {
@@ -141,6 +142,24 @@ def refresh_access_token(response: Response, refresh_token: str = Cookie(None)):
     }
 
 
+def get_current_user(refresh_token: str = Cookie(None), db: Session = Depends(get_db)):
+    """Extract the user from the JWT refresh token."""
+    if not refresh_token:
+        raise HTTPException(status_code=401, detail="Missing token")
+
+    try:
+        payload = jwt.decode(refresh_token, settings.secret_key, algorithms=[settings.algorithm])
+        username = payload.get("sub")
+        if not username:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return user
 @router.post('/logout', status_code=204)
 async def logout(response: Response):
     response.set_cookie(
@@ -148,6 +167,6 @@ async def logout(response: Response):
         value='',
         httponly=True,
         samesite="none",
-
+        secure=True
     )
     return {"message": "you're logged out !"}
