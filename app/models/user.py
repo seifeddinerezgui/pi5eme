@@ -24,4 +24,6 @@ class User(Base):
     user_lessons = relationship("UserLesson", back_populates="user")
     notes = relationship("Note",back_populates="author")
 
+    historical_trades = relationship("HistoricalTrade", back_populates="user")
+
 

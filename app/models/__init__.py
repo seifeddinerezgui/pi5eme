@@ -8,3 +8,8 @@ from .marketData import MarketData
 from .ScheduledOrder import ScheduledOrder
 from .lesson import Lesson
 from .user_lesson import UserLesson
+from .HistoricalTrade import HistoricalTrade
+from .HistoricalScenario import HistoricalScenario
+from .ExpertTrade import ExpertTrade
+from .HistoricalData import HistoricalData
+

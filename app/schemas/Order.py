@@ -9,6 +9,8 @@ class OrderCreate(BaseModel):
     order_type: Literal['market', 'limit']  # Market or limit order
     action: Literal['buy', 'sell']  # Buy or sell action
     price: Optional[float] = Field(None, description="Price for limit orders")  # Optional for market orders
+    take_profit: Optional[float] = Field(None, description="Take Profit price")  # New Field
+    stop_loss: Optional[float] = Field(None, description="Stop Loss price")  # New Field
 
 class OrderResponse(BaseModel):
     id: int
@@ -19,6 +21,9 @@ class OrderResponse(BaseModel):
     action: str
     status: str
     executed_at: Optional[datetime]
+    take_profit: Optional[float]  # New Field
+    stop_loss: Optional[float]  # New Field
 
     class Config:
         orm_mode = True
+
