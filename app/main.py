@@ -2,6 +2,7 @@ from datetime import time
 from fastapi import FastAPI, BackgroundTasks
 # FastAPI instance and startup
 from fastapi import FastAPI
+from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy, bond
 
 from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy, note
 from app.api.routers import auth, portfolio, user, education, lesson
@@ -87,6 +88,12 @@ app.include_router(comparison.router, prefix="/comparison", tags=["Comparison"])
 app.include_router(prediction.router, prefix="/predeiction", tags=["Prediction"])
 app.include_router(risk.router, prefix="/risk", tags=["Risk"])
 app.include_router(strategy.router, prefix="/strategy", tags=["Strategy"])
+app.include_router(bond.router,prefix="/bond", tags="Bond")
+
+
+
+
+
 app.include_router(user.router, prefix="/user", tags=["User"])
 app.include_router(lesson.router,prefix="/lesson", tags=['Lesson'])
 app.include_router(education.router,prefix="/education",tags=['Education'])
