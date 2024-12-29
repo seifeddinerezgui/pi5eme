@@ -10,3 +10,8 @@ from .notification import Notification
 from .priceAlerts import PriceAlert
 from .lesson import Lesson
 from .user_lesson import UserLesson
+from .HistoricalTrade import HistoricalTrade
+from .HistoricalScenario import HistoricalScenario
+from .ExpertTrade import ExpertTrade
+from .HistoricalData import HistoricalData
+

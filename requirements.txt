@@ -17,3 +17,11 @@ pandas
 yfinance
 tensorflow
 sklearn
+SentencePiece
+pandas
+yfinance
+scikit-learn
+tensorflow
+httpx
+ta
+prophet

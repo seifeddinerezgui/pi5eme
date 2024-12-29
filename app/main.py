@@ -6,6 +6,13 @@ from app.api.routers import auth, portfolio, comparison, prediction, risk, strat
 from app.api.routers import auth, portfolio, user, education, lesson
 from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy
 from app.api.routers import auth, portfolio, user, education, lesson, VaR_router
+
+from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy, note
+from app.api.routers import auth, portfolio, user, education, lesson
+
+from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy, stock_forcasting
+from app.api.routers import auth, portfolio, user, education, lesson, VaR_router, monte_carlo_simulation, historical_replay
+
 from app.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routers import auth, order, portfolio, marketdata,Notification,PriceAlere
@@ -72,7 +79,7 @@ async def startup_event():
 async def background_task_runner(db: Session):
     """Background task to check and process limit orders every minute."""
     while True:
-        OrderService.process_limit_orders(db)  # Process pending limit orders
+        OrderService.process_limit_orders(db)  # Process pending limit orders 
         await asyncio.sleep(60)  # Wait for 60 seconds before next check
 
 # CORS configuration
@@ -112,7 +119,14 @@ app.include_router(user.router, prefix="/user", tags=["User"])
 app.include_router(lesson.router,prefix="/lesson", tags=['Lesson'])
 app.include_router(education.router,prefix="/education",tags=['Education'])
 
+app.include_router(note.router,prefix="/note",tags=['Note'])
+
+
+app.include_router(stock_forcasting.router, prefix="/forecast", tags=["Forecasting"])
 app.include_router(VaR_router.router, prefix="/risk", tags=["Risk Management"])
+app.include_router(monte_carlo_simulation.router, prefix="/risk", tags=["monte-carlo-simulation"])
+app.include_router(historical_replay.router, prefix="/historical", tags=["Historical Scenarios"])
+
 
 # Add custom middleware
 app.add_middleware(AuthMiddleware)
@@ -120,6 +134,7 @@ app.add_middleware(AuthMiddleware)
 def read_root():
     """Root endpoint."""
     return {"message": "Welcome to the Trading Simulator API!"}
+
 
 app.add_middleware(
     CORSMiddleware,
