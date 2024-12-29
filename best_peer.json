@@ -1,0 +1,12 @@
+{
+    "AAPL": {
+        "best_peer": "SMCI",
+        "sentiment_score": 0.999565064907074,
+        "interpretation": "Positive sentiment detected. Consider buying or holding."
+    },
+    "META": {
+        "best_peer": "PINS",
+        "sentiment_score": 0.9973763227462769,
+        "interpretation": "Positive sentiment detected. Consider buying or holding."
+    }
+}

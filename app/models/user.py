@@ -24,6 +24,7 @@ class User(Base):
     notifications = relationship("Notification", back_populates="user")  # Relation avec les notifications
     price_alerts = relationship("PriceAlert", back_populates="user")
     user_lessons = relationship("UserLesson", back_populates="user")
+    bonds = relationship("Bond", back_populates="user")  # Relation avec les bonds
     notes = relationship("Note",back_populates="author")
 
     historical_trades = relationship("HistoricalTrade", back_populates="user")
