@@ -22,6 +22,7 @@ class User(Base):
     orders = relationship("Order", back_populates="user")  # Relation avec les ordres instantanés
     scheduled_orders = relationship("ScheduledOrder", back_populates="user")
     user_lessons = relationship("UserLesson", back_populates="user")
+    notes = relationship("Note",back_populates="author")
 
     historical_trades = relationship("HistoricalTrade", back_populates="user")
 
