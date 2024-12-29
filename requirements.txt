@@ -13,6 +13,10 @@ alembic
 transformers
 torch
 finnhub-python
+pandas
+yfinance
+tensorflow
+sklearn
 SentencePiece
 pandas
 yfinance

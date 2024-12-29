@@ -1,4 +1,3 @@
-# app/schemas/order.py
 from pydantic import BaseModel, Field
 from typing import Literal, Optional
 from datetime import datetime
@@ -12,6 +11,11 @@ class OrderCreate(BaseModel):
     take_profit: Optional[float] = Field(None, description="Take Profit price")  # New Field
     stop_loss: Optional[float] = Field(None, description="Stop Loss price")  # New Field
 
+    # New optional fields
+    stop_loss: Optional[float] = Field(None, description="Optional stop loss value")
+    take_profit: Optional[float] = Field(None, description="Optional take profit value")
+
+
 class OrderResponse(BaseModel):
     id: int
     symbol: str
@@ -23,6 +27,10 @@ class OrderResponse(BaseModel):
     executed_at: Optional[datetime]
     take_profit: Optional[float]  # New Field
     stop_loss: Optional[float]  # New Field
+
+    # New fields for response
+    stop_loss: Optional[float]
+    take_profit: Optional[float]
 
     class Config:
         orm_mode = True

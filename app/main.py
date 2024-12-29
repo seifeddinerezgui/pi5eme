@@ -2,6 +2,10 @@ from datetime import time
 from fastapi import FastAPI, BackgroundTasks
 # FastAPI instance and startup
 from fastapi import FastAPI
+from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy
+from app.api.routers import auth, portfolio, user, education, lesson
+from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy
+from app.api.routers import auth, portfolio, user, education, lesson, VaR_router
 from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy, bond
 
 from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy, note
@@ -12,8 +16,16 @@ from app.api.routers import auth, portfolio, user, education, lesson, VaR_router
 
 from app.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routers import auth, order, portfolio, marketdata
+from app.api.routers import auth, order, portfolio, marketdata,Notification,PriceAlere
 from app.database import Base, engine, SessionLocal
+from app.services.PriceAlertSerice import check_price_alerts ,start_scheduler # Si cette fonction est utilisée pour vérifier les alertes
+from app.services.portfolio_management import start_balance_update_scheduler # Si cette fonction est utilisée pour vérifier les alertes
+
+
+
+
+
+
 from app.middleware.auth_middleware import AuthMiddleware
 from app.services.OrderService import OrderService
 from sqlalchemy.orm import Session
@@ -55,6 +67,11 @@ def custom_openapi():
 app.openapi = custom_openapi
 
 @app.on_event("startup")
+def on_startup():
+    start_scheduler()  # Démarre le scheduler
+    start_balance_update_scheduler(1)
+  
+
 async def startup_event():
     """Startup event to initiate background tasks."""
     db = SessionLocal()  # Open a DB session
@@ -83,6 +100,17 @@ Base.metadata.create_all(bind=engine)
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(portfolio.router, prefix="/portfolio", tags=["Portfolio"])
 app.include_router(order.router, prefix="/order", tags=["Order"])
+app.include_router(marketdata.router, prefix="/market", tags=["MarketData"]) 
+app.include_router(Notification.router, prefix="/notifications", tags=["Notifications"])  
+app.include_router(PriceAlere.router, prefix="/alerts", tags=["Price Alerts"]) 
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the Trading Simulator API!"}
+
+
+app.add_middleware(AuthMiddleware)
+app.include_router(portfolio.router, prefix="/portfolio", tags=["Portfolio"])
 app.include_router(marketdata.router, prefix="/market", tags=["MarketData"])
 app.include_router(comparison.router, prefix="/comparison", tags=["Comparison"])
 app.include_router(prediction.router, prefix="/predeiction", tags=["Prediction"])

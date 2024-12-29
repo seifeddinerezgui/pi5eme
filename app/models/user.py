@@ -21,6 +21,8 @@ class User(Base):
     transactions = relationship("Transaction", back_populates="user")
     orders = relationship("Order", back_populates="user")  # Relation avec les ordres instantanés
     scheduled_orders = relationship("ScheduledOrder", back_populates="user")
+    notifications = relationship("Notification", back_populates="user")  # Relation avec les notifications
+    price_alerts = relationship("PriceAlert", back_populates="user")
     user_lessons = relationship("UserLesson", back_populates="user")
     bonds = relationship("Bond", back_populates="user")  # Relation avec les bonds
     notes = relationship("Note",back_populates="author")
