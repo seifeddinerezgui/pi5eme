@@ -11,3 +11,4 @@ from .priceAlerts import PriceAlert
 from .lesson import Lesson
 from .user_lesson import UserLesson
 from .order import Order
+from .bond import Bond

@@ -26,5 +26,6 @@ class User(Base):
     user_lessons = relationship("UserLesson", back_populates="user")
     bonds = relationship("Bond", back_populates="user")  # Relation avec les bonds
     notes = relationship("Note",back_populates="author")
+    order =relationship("Order", back_populates="user")
 
 

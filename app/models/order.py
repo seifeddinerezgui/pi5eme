@@ -5,7 +5,7 @@ from app.database import Base
 from datetime import datetime
 
 class Order(Base):
-    __tablename__ = "orders"
+    __tablename__ = "order"
 
     id = Column(Integer, primary_key=True, index=True)
     symbol = Column(String(10), index=True, nullable=False)
@@ -21,7 +21,7 @@ class Order(Base):
     stop_loss = Column(Float, nullable=True)  # Optional stop loss
     take_profit = Column(Float, nullable=True) 
     user_id = Column(Integer, ForeignKey('users.id'))
-    user = relationship("User", back_populates="orders")
+    user = relationship("User", back_populates="order")
 
 
 

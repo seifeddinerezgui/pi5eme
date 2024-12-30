@@ -1,5 +1,5 @@
-from OpenSSL.SSL import Session
-
+from sqlalchemy.orm import Session
+import asyncio
 from app.api.routers import assets,price,stategie
 
 from fastapi import FastAPI
