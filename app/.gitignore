@@ -1,0 +1,26 @@
+# Ignorer les fichiers générés par Python
+__pycache__/
+*.pyc
+*.pyo
+*.py[cod]
+*$py.class
+
+# Ignorer les versions générées par Alembic
+alembic/versions/
+
+# Ignorer les fichiers spécifiques à votre IDE
+.idea/
+*.iml
+
+# Ignorer les fichiers système
+.DS_Store
+Thumbs.db
+
+# Ignorer les logs et les fichiers de debug
+*.log
+
+# Ignorer les environnements virtuels
+env/
+venv/
+*.env
+*.venv

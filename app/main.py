@@ -1,35 +1,20 @@
-from datetime import time
-from fastapi import FastAPI, BackgroundTasks
-# FastAPI instance and startup
+from sqlalchemy.orm import Session
+import asyncio
+from app.api.routers import assets,price,stategie
+
 from fastapi import FastAPI
+
+
 from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy
-from app.api.routers import auth, portfolio, user, education, lesson
-from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy
-from app.api.routers import auth, portfolio, user, education, lesson, VaR_router
-from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy, bond
+from app.api.routers import auth, portfolio, user, education, lesson,order_market ,marketdata1,bond,note
 
-from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy, note
-from app.api.routers import auth, portfolio, user, education, lesson
-
-from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy, stock_forcasting
-from app.api.routers import auth, portfolio, user, education, lesson, VaR_router, monte_carlo_simulation, historical_replay
-
+from app.api.routers import auth, portfolio ,marketdata,order,assets,price
 from app.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.routers import auth, order, portfolio, marketdata,Notification,PriceAlere
+from app.api.routers import auth, order, portfolio
 from app.database import Base, engine, SessionLocal
-from app.services.PriceAlertSerice import check_price_alerts ,start_scheduler # Si cette fonction est utilisée pour vérifier les alertes
-from app.services.portfolio_management import start_balance_update_scheduler # Si cette fonction est utilisée pour vérifier les alertes
-
-
-
-
-
-
 from app.middleware.auth_middleware import AuthMiddleware
 from app.services.OrderService import OrderService
-from sqlalchemy.orm import Session
-import asyncio  # Use asyncio for background processing
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -67,11 +52,6 @@ def custom_openapi():
 app.openapi = custom_openapi
 
 @app.on_event("startup")
-def on_startup():
-    start_scheduler()  # Démarre le scheduler
-    start_balance_update_scheduler(1)
-  
-
 async def startup_event():
     """Startup event to initiate background tasks."""
     db = SessionLocal()  # Open a DB session
@@ -80,7 +60,7 @@ async def startup_event():
 async def background_task_runner(db: Session):
     """Background task to check and process limit orders every minute."""
     while True:
-        OrderService.process_limit_orders(db)  # Process pending limit orders 
+        OrderService.process_limit_orders(db)  # Process pending limit orders
         await asyncio.sleep(60)  # Wait for 60 seconds before next check
 
 # CORS configuration
@@ -91,27 +71,23 @@ origins = [
 ]
 
 
-
-
 # Create all tables if they don't exist
 Base.metadata.create_all(bind=engine)
+# Include the routers for the various API endpoints
+app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+
+app.add_middleware(AuthMiddleware)
+app.include_router(portfolio.router, prefix="/portfolio", tags=["Portfolio"])
+app.include_router(order_market.router, prefix="/order", tags=["Order_market"])
+app.include_router(marketdata1.router, prefix="/market", tags=["MarketData1"])
+app.include_router(assets.router, prefix="/assets", tags=["MarketData1"])
+app.include_router(price.router, prefix="/price", tags=["Price"])
+app.include_router(stategie.router, prefix="/strategie", tags=["Strategie"])
 
 # Include API routers
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(portfolio.router, prefix="/portfolio", tags=["Portfolio"])
 app.include_router(order.router, prefix="/order", tags=["Order"])
-app.include_router(marketdata.router, prefix="/market", tags=["MarketData"]) 
-app.include_router(Notification.router, prefix="/notifications", tags=["Notifications"])  
-app.include_router(PriceAlere.router, prefix="/alerts", tags=["Price Alerts"]) 
-
-@app.get("/")
-def read_root():
-    return {"message": "Welcome to the Trading Simulator API!"}
-
-
-app.add_middleware(AuthMiddleware)
-app.include_router(portfolio.router, prefix="/portfolio", tags=["Portfolio"])
-app.include_router(marketdata.router, prefix="/market", tags=["MarketData"])
 app.include_router(comparison.router, prefix="/comparison", tags=["Comparison"])
 app.include_router(prediction.router, prefix="/predeiction", tags=["Prediction"])
 app.include_router(risk.router, prefix="/risk", tags=["Risk"])
@@ -119,29 +95,23 @@ app.include_router(strategy.router, prefix="/strategy", tags=["Strategy"])
 app.include_router(bond.router,prefix="/bond", tags="Bond")
 
 
-
-
-
 app.include_router(user.router, prefix="/user", tags=["User"])
 app.include_router(lesson.router,prefix="/lesson", tags=['Lesson'])
 app.include_router(education.router,prefix="/education",tags=['Education'])
-
 app.include_router(note.router,prefix="/note",tags=['Note'])
 
 
-app.include_router(stock_forcasting.router, prefix="/forecast", tags=["Forecasting"])
-app.include_router(VaR_router.router, prefix="/risk", tags=["Risk Management"])
-app.include_router(monte_carlo_simulation.router, prefix="/risk", tags=["monte-carlo-simulation"])
-app.include_router(historical_replay.router, prefix="/historical", tags=["Historical Scenarios"])
-
-
 # Add custom middleware
-app.add_middleware(AuthMiddleware)
 @app.get("/")
 def read_root():
     """Root endpoint."""
     return {"message": "Welcome to the Trading Simulator API!"}
 
+app.include_router(order.router, prefix="/order", tags=["Order"])
+app.include_router(marketdata.router, prefix="/market", tags=["MarketData"])
+app.include_router(assets.router, prefix="/assets", tags=["MarketData"])
+
+app.include_router(price.router, prefix="/price", tags=["Price"])
 
 app.add_middleware(
     CORSMiddleware,
@@ -150,3 +120,4 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all HTTP methods
     allow_headers=["*"],  # Allows all headers
 )
+

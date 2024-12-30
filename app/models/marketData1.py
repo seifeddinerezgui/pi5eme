@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, Float, String, DateTime
 from app.database import Base
 from datetime import datetime
 
-class MarketData(Base):
+class MarketData1(Base):
     __tablename__ = "market_data"
 
     id = Column(Integer, primary_key=True, index=True)

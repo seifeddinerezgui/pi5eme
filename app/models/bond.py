@@ -14,3 +14,5 @@ class Bond(Base):
     
      user_id = Column(Integer, ForeignKey('users.id'))
      user = relationship("User", back_populates="bonds")
+
+

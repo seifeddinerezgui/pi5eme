@@ -6,9 +6,11 @@ class BondBase(BaseModel):
     market_rate: float
     maturity: int
     payment_frequency: int
+    
 
 class BondCreate(BondBase):
     pass
+
 
 class BondRead(BondBase):
     bond_id: int

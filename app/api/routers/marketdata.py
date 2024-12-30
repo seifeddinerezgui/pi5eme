@@ -6,7 +6,7 @@ from app.services.MarketDataService import MarketDataService
 
 router = APIRouter()
 
-FMP_API_KEY = "a7dKVTQUqHWZVm51wvaRqJTrw6H4Hcvi"
+FMP_API_KEY = "hzlBlPFOVkNATY9eOYfij1UvlZS6k95N"
 
 @router.get("/data/{symbol}", response_model=dict)
 async def get_market_data(symbol: str):
