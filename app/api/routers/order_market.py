@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.schemas.Order import OrderCreate, SellOrderCreate, OrderResponse
+from app.schemas.Order_market import  OrderResponse
 from app.database import get_db
-from app.schemas.Order import OrderCreate, SellOrderCreate
-from app.services.OrderService import OrderService
+from app.schemas.Order_market import OrderCreate, SellOrderCreate
+from app.services.OrderService1 import OrderService
 from starlette.requests import Request
 from typing import List
-from app.models import User, Order
+from app.models import User, Order_market
 
 router = APIRouter()
 @router.post("/buy", response_model=OrderCreate)
@@ -34,7 +34,7 @@ def get_user_orders(request: Request, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
 
-    orders = db.query(Order).filter(Order.user_id == user.id).all()
+    orders = db.query(Order_market).filter(Order_market.user_id == user.id).all()
 
     if not orders:
         raise HTTPException(status_code=404, detail="Aucun ordre trouvé pour cet utilisateur")

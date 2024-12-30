@@ -1,9 +1,9 @@
 import requests
 from fastapi import HTTPException
 
-class MarketDataService:
+class MarketDataService1:
     API_URL = "https://www.alphavantage.co/query"
-    API_KEY = "K90ZCCULJZ619JGB"
+    API_KEY = "8F7BODH259SP28AQ"
 
     @classmethod
     def get_market_data(cls, symbol: str) -> float:

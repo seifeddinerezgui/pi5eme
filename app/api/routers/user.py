@@ -27,5 +27,20 @@ async def get_current_user(request : Request, db: Session = Depends(get_db)):
         "proficiency" : current.proficiency
     }
 
+# Route pour récupérer la liste des utilisateurs
+@router.get("/users", response_model=list[dict])
+async def get_users(db: Session = Depends(get_db)):
+    users = db.query(User).all()
+    return [
+        {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "age": user.age if user.age else None,
+            "experience": user.experience if user.experience else None,
+            "education_level": user.education_level if user.education_level else None
+        }
+        for user in users
+    ]
 
 

@@ -3,8 +3,9 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 from app.models import Portfolio, Asset, Transaction, User
-from app.models.order import Order
-from app.services.MarketDataService import MarketDataService
+from app.models.order_market import Order_market
+from app.services.MarketDataService1 import MarketDataService1
+from app.services.copy_trade_service import copy_order_for_followers
 
 class OrderService:
 
@@ -20,7 +21,7 @@ class OrderService:
             raise HTTPException(status_code=404, detail="Portfolio not found")
 
         # Step 2: Fetch the current market price of the asset
-        current_price = MarketDataService.get_market_data(symbol)
+        current_price = MarketDataService1.get_market_data(symbol)
 
         # Step 3: Calculate total cost of the order
         total_cost = current_price * quantity
@@ -33,7 +34,7 @@ class OrderService:
         portfolio.balance -= total_cost
 
         # Step 6: Create a new order
-        db_order = Order(
+        db_order = Order_market(
             symbol=symbol,
             quantity=quantity,
             price=current_price,
@@ -74,13 +75,14 @@ class OrderService:
             )
             db.add(new_asset)
 
+
         # Step 9: Commit changes to the database
         db.add(db_order)
         db.add(transaction)
         db.commit()
         db.refresh(db_order)
         db.refresh(portfolio)
-
+        copy_order_for_followers(db_order, db)
         return db_order
 
 
@@ -103,7 +105,7 @@ class OrderService:
             raise HTTPException(status_code=404, detail="Portfolio not found")
 
         # Step 2: Fetch the current market price of the asset
-        current_price = MarketDataService.get_market_data(symbol)
+        current_price = MarketDataService1.get_market_data(symbol)
 
         # Step 3: Fetch the asset from the portfolio
         asset = db.query(Asset).filter(Asset.portfolio_id == portfolio.id, Asset.symbol == symbol).first()
@@ -136,7 +138,7 @@ class OrderService:
             db.delete(asset)  # Remove asset if quantity is zero
 
         # Step 9: Create a new order
-        db_order = Order(
+        db_order = Order_market(
             symbol=symbol,
             quantity=quantity,
             price=current_price,
@@ -163,5 +165,5 @@ class OrderService:
         db.commit()
         db.refresh(db_order)
         db.refresh(portfolio)
-
+        copy_order_for_followers(db_order, db)
         return db_order

@@ -3,7 +3,7 @@ from typing import Optional
 import pandas as pd
 from pydantic import BaseModel
 
-from app.services.MarketDataService import MarketDataService
+from app.services.MarketDataService1 import MarketDataService1
 
 router = APIRouter()
 
@@ -24,7 +24,7 @@ async def get_trading_signal(request: TradingStrategyRequest):
     """
     try:
         # Récupération des données de marché
-        data = MarketDataService.get_market_data1(request.symbol, interval="1d")
+        data = MarketDataService1.get_market_data1(request.symbol, interval="1d")
 
         # Conversion des données dans un format exploitable
         df = pd.DataFrame.from_dict(data, orient="index")

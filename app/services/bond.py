@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app import models
 from app.models import Bond
 from app.models.portfolio import Portfolio
+from app.models.user import User
 from app.schemas.bond import BondCreate
 
 import yfinance as yf
@@ -12,13 +13,14 @@ import numpy as np
 
 
 #cv
-def add_bond(db: Session, bond_data: BondCreate):
+def add_bond(user_id: int,db: Session, bond_data: BondCreate):
     new_bond = Bond(
         face_value=bond_data.face_value,
         coupon_rate=bond_data.coupon_rate,
         market_rate=bond_data.market_rate,
         maturity=bond_data.maturity,
         payment_frequency=bond_data.payment_frequency,
+        user_id=user_id
     )
     db.add(new_bond)
     db.commit()
@@ -27,7 +29,9 @@ def add_bond(db: Session, bond_data: BondCreate):
 
 #cv
 def calculate_bond_price(db: Session,id :int):
-  
+    user = db.query(User).filter(id == id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
     bond = db.query(Bond).filter(Bond.bond_id ==id).first()
     periods = bond.maturity * bond.payment_frequency
     coupon = bond.face_value * bond.coupon_rate / bond.payment_frequency
@@ -49,6 +53,9 @@ def calculate_bond_price(db: Session,id :int):
 
 #cv
 def simulate_portfolio_with_bond(db: Session, user_id: int, bond_id: int):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
     portfolio = db.query(models.Portfolio).filter(models.Portfolio.user_id == user_id).first()
     bond = db.query(models.Bond).filter(models.Bond.bond_id == bond_id).first()
     if portfolio is None or bond is None:
@@ -80,6 +87,9 @@ def bond_price(face_value: float, coupon_rate: float, market_rate: float, maturi
 
 #Nrmln labes
 def portfolio_risk_analysis(db: Session, user_id: int):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
     # Récupérer le portefeuille de l'utilisateur
     portfolio = db.query(models.Portfolio).filter(models.Portfolio.user_id == user_id).first()
     if portfolio is None:
@@ -140,6 +150,9 @@ def calculate_beta(stock_ticker: str, market_ticker: str, start_date: str, end_d
 
 # aamla ro7ha cv 
 def calculate_zero_coupon_bonds_for_coverage(db: Session, user_id: int):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
     # Calculate the portfolio risk
     risk = portfolio_risk_analysis(db, user_id)
     
@@ -174,7 +187,6 @@ def calculate_zero_coupon_bonds_for_coverage(db: Session, user_id: int):
 
     return {"required_bonds": required_bonds_list}
 
-
 #a voir
 def suggested_bonds_for_coverage(db: Session, user_id: int):
     portfolio = db.query(models.Portfolio).filter(models.Portfolio.user_id == user_id).first()
@@ -183,4 +195,4 @@ def suggested_bonds_for_coverage(db: Session, user_id: int):
     
     risk = portfolio_risk_analysis(db, user_id)  # Assumer un changement de taux de 0 pour obtenir le risque
     required_bonds = calculate_zero_coupon_bonds_for_coverage(db, user_id)
-    return {"suggested_bonds": required_bonds["required_bonds"]}
+    return  {"suggested_bonds": required_bonds["required_bonds"]}

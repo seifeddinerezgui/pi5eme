@@ -2,7 +2,7 @@ import time
 import numpy as np
 from fastapi import HTTPException
 
-from app.services.MarketDataService import MarketDataService
+from app.services.MarketDataService1 import MarketDataService1
 
 
 class SimpleMovingAverageStrategy:
@@ -16,7 +16,7 @@ class SimpleMovingAverageStrategy:
         self.symbol = symbol
         self.short_window = short_window
         self.long_window = long_window
-        self.market_data_service = MarketDataService
+        self.market_data_service = MarketDataService1
 
     def calculate_moving_average(self, data: dict, window: int) -> np.ndarray:
         """

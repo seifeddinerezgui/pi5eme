@@ -1,12 +1,12 @@
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LinearRegression
-from app.services.MarketDataService import MarketDataService
+from app.services.MarketDataService1 import MarketDataService1
 
 class PriceRecommender:
     def __init__(self, symbol: str):
         self.symbol = symbol
-        self.data_fetcher = MarketDataService()
+        self.data_fetcher = MarketDataService1()
         self.historical_data = self.data_fetcher.get_historical_data(symbol)
 
         # Afficher les données historiques récupérées
