@@ -21,8 +21,10 @@ class User(Base):
     transactions = relationship("Transaction", back_populates="user")
     orders = relationship("Order_market", back_populates="user")  # Relation avec les ordres instantanés
     scheduled_orders = relationship("ScheduledOrder", back_populates="user")
+    notifications = relationship("Notification", back_populates="user")  # Relation avec les notifications
+    price_alerts = relationship("PriceAlert", back_populates="user")
     user_lessons = relationship("UserLesson", back_populates="user")
-    notes = relationship("Note",back_populates="author")
     bonds = relationship("Bond", back_populates="user")  # Relation avec les bonds
-    followers = relationship("CopyTradeRelationship", foreign_keys="CopyTradeRelationship.trader_id", back_populates="trader", cascade="all, delete-orphan")
-    leaders = relationship("CopyTradeRelationship", foreign_keys="CopyTradeRelationship.follower_id", back_populates="follower", cascade="all, delete-orphan")
+    notes = relationship("Note",back_populates="author")
+
+

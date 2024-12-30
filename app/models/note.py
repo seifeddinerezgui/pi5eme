@@ -10,6 +10,6 @@ class Note(Base):
     __tablename__="notes"
     id = Column(Integer, primary_key=True,index=True)
     content = Column(Text(65000),nullable=False)
-    created_at = Column(DateTime,default=datetime.now())
+    created_at = Column(DateTime,default=datetime.now)
     user_id = Column(Integer, ForeignKey("users.id"))
     author = relationship("User", back_populates="notes")

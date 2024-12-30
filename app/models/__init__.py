@@ -6,6 +6,8 @@ from .transaction import Transaction
 from .order_market import Order_market
 from .marketData1 import MarketData1
 from .ScheduledOrder import ScheduledOrder
+from .notification import Notification
+from .priceAlerts import PriceAlert
 from .lesson import Lesson
 from .user_lesson import UserLesson
-from .bond import Bond
+from .order import Order
