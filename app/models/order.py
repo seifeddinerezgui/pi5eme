@@ -18,8 +18,7 @@ class Order(Base):
     take_profit = Column(Float, nullable=True)  # New Field: Take Profit
     stop_loss = Column(Float, nullable=True)  # New Field: Stop Loss
 
-    stop_loss = Column(Float, nullable=True)  # Optional stop loss
-    take_profit = Column(Float, nullable=True) 
+    
     user_id = Column(Integer, ForeignKey('users.id'))
     user = relationship("User", back_populates="order")
 

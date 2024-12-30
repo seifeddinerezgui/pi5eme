@@ -1,6 +1,12 @@
 from pydantic import BaseModel, Field
 from typing import Literal, Optional
 from datetime import datetime
+from dataclasses import Field
+from datetime import datetime
+
+from pydantic import BaseModel
+from typing import Literal, Optional
+
 
 class OrderCreate(BaseModel):
     symbol: str

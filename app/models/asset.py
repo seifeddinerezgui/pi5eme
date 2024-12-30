@@ -13,5 +13,6 @@ class Asset(Base):
     position_type = Column(String(5), nullable=False)  # 'long' or 'short'
     portfolio_id = Column(Integer, ForeignKey('portfolios.id'))  # ForeignKey to Portfolio
 
+    portfolio_id = Column(Integer, ForeignKey('portfolios.id'))  # ForeignKey to Portfolio
     # Relationship to portfolio
     portfolio = relationship("Portfolio", back_populates="assets")

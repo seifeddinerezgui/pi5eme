@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy
 from app.api.routers import auth, portfolio, user, education, lesson,order_market ,marketdata1,bond,note
 
+from app.api.routers import auth, portfolio ,marketdata,order,assets,price
 from app.database import Base, engine
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routers import auth, order, portfolio
@@ -106,6 +107,11 @@ def read_root():
     """Root endpoint."""
     return {"message": "Welcome to the Trading Simulator API!"}
 
+app.include_router(order.router, prefix="/order", tags=["Order"])
+app.include_router(marketdata.router, prefix="/market", tags=["MarketData"])
+app.include_router(assets.router, prefix="/assets", tags=["MarketData"])
+
+app.include_router(price.router, prefix="/price", tags=["Price"])
 
 app.add_middleware(
     CORSMiddleware,
@@ -114,3 +120,4 @@ app.add_middleware(
     allow_methods=["*"],  # Allows all HTTP methods
     allow_headers=["*"],  # Allows all headers
 )
+
