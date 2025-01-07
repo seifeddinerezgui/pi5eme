@@ -12,3 +12,7 @@ from .lesson import Lesson
 from .user_lesson import UserLesson
 from .order import Order
 from .bond import Bond
+from .HistoricalTrade import HistoricalTrade
+from .HistoricalScenario import HistoricalScenario
+from .ExpertTrade import ExpertTrade
+from .HistoricalData import HistoricalData

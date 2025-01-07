@@ -1,21 +1,16 @@
+# app/schemas/order.py
 from pydantic import BaseModel, Field
 from typing import Literal, Optional
 from datetime import datetime
-from dataclasses import Field
-from datetime import datetime
-
-from pydantic import BaseModel
-from typing import Literal, Optional
-
 
 class OrderCreate(BaseModel):
     symbol: str
     quantity: float
     order_type: Literal['market', 'limit']  # Market or limit order
     action: Literal['buy', 'sell']  # Buy or sell action
-    price: Optional[float] = Field(None, description="Price for limit orders")  # Optional for market orders
-    take_profit: Optional[float] = Field(None, description="Take Profit price")  # New Field
-    stop_loss: Optional[float] = Field(None, description="Stop Loss price")  # New Field
+    price: Optional[float] = Field(None)  # Optional for market orders
+    take_profit: Optional[float] = Field(None)  # New Field
+    stop_loss: Optional[float] = Field(None)  # New Field
 
     # New optional fields
     stop_loss: Optional[float] = Field(None, description="Optional stop loss value")
