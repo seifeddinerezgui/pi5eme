@@ -15,7 +15,7 @@ class Transaction(Base):
     position_type = Column(String(5), nullable=False)  # 'long' or 'short'
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    user_id = Column(Integer, ForeignKey('users.id'))  # ForeignKey to User
+    user_id = Column(Integer, ForeignKey("users.id"))  # ForeignKey to User
 
     # Relationships
     user = relationship("User", back_populates="transactions")

@@ -1,8 +1,6 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
 from app.database import Base
-from app.models import user_lesson
-
 
 class User(Base):
     __tablename__ = "users"
@@ -19,13 +17,27 @@ class User(Base):
     # Relationships
     portfolio = relationship("Portfolio", back_populates="user")
     transactions = relationship("Transaction", back_populates="user")
-    orders = relationship("Order_market", back_populates="user")  # Relation avec les ordres instantanés
+    orders = relationship("Order_market", back_populates="user")
     scheduled_orders = relationship("ScheduledOrder", back_populates="user")
-    notifications = relationship("Notification", back_populates="user")  # Relation avec les notifications
+    notifications = relationship("Notification", back_populates="user")
     price_alerts = relationship("PriceAlert", back_populates="user")
     user_lessons = relationship("UserLesson", back_populates="user")
-    bonds = relationship("Bond", back_populates="user")  # Relation avec les bonds
-    notes = relationship("Note",back_populates="author")
-    order =relationship("Order", back_populates="user")
+    bonds = relationship("Bond", back_populates="user")
+    notes = relationship("Note", back_populates="author")
+    order = relationship("Order", back_populates="user")
+    historical_trades = relationship("HistoricalTrade", back_populates="user")
+    alerts = relationship("Alert", back_populates="user")  # Corrected relationship
 
+    followers = relationship(
+        "CopyTradeRelationship",
+        foreign_keys="CopyTradeRelationship.trader_id",
+        back_populates="trader",
+        cascade="all, delete-orphan",  # Optional: to manage the lifecycle
+    )
 
+    leaders = relationship(
+        "CopyTradeRelationship",
+        foreign_keys="CopyTradeRelationship.follower_id",
+        back_populates="follower",
+        cascade="all, delete-orphan",  # Optional
+    )

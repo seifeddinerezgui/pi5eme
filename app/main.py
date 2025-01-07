@@ -5,8 +5,8 @@ from app.api.routers import assets,price,stategie
 from fastapi import FastAPI
 
 
-from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy
-from app.api.routers import auth, portfolio, user, education, lesson,order_market ,marketdata1,bond,note
+from app.api.routers import auth, portfolio, comparison, prediction, risk, strategy,historical_replay,copy_trade
+from app.api.routers import auth, portfolio, user, education, lesson,order_market ,marketdata1,bond,note,Notification
 
 from app.api.routers import auth, portfolio ,marketdata,order,assets,price
 from app.database import Base, engine
@@ -92,13 +92,14 @@ app.include_router(comparison.router, prefix="/comparison", tags=["Comparison"])
 app.include_router(prediction.router, prefix="/predeiction", tags=["Prediction"])
 app.include_router(risk.router, prefix="/risk", tags=["Risk"])
 app.include_router(strategy.router, prefix="/strategy", tags=["Strategy"])
-app.include_router(bond.router,prefix="/bond", tags="Bond")
-
+app.include_router(bond.router,prefix="/bond", tags=["Bond"])
 
 app.include_router(user.router, prefix="/user", tags=["User"])
 app.include_router(lesson.router,prefix="/lesson", tags=['Lesson'])
 app.include_router(education.router,prefix="/education",tags=['Education'])
 app.include_router(note.router,prefix="/note",tags=['Note'])
+app.include_router(historical_replay.router, prefix="/historical", tags=["Historical Scenarios"])
+app.include_router(copy_trade.router, prefix="/copy", tags=["copytrade"])
 
 
 # Add custom middleware
@@ -112,6 +113,8 @@ app.include_router(marketdata.router, prefix="/market", tags=["MarketData"])
 app.include_router(assets.router, prefix="/assets", tags=["MarketData"])
 
 app.include_router(price.router, prefix="/price", tags=["Price"])
+app.include_router(Notification.router, prefix="/notification", tags=["NOT"])
+
 
 app.add_middleware(
     CORSMiddleware,

@@ -2,7 +2,6 @@
 
 from fastapi import HTTPException, APIRouter
 import requests
-from app.services.MarketDataService import MarketDataService
 
 router = APIRouter()
 
